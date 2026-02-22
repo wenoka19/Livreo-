@@ -2,6 +2,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const cors = require('cors');
 const path = require('path');
 
@@ -11,18 +12,33 @@ mongoose.set('bufferCommands', false);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// ===== TRUST PROXY (required for Railway / HTTPS) =====
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
+
 // ===== MIDDLEWARE =====
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const isProduction = process.env.NODE_ENV === 'production';
+const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/livreo';
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'livreo_secret',
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: mongoUrl,
+    collectionName: 'sessions',
+    ttl: 24 * 60 * 60, // 24h
+  }),
   cookie: {
     secure: isProduction,
+    httpOnly: true,
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 24 * 60 * 60 * 1000, // 24h
   },
 }));
@@ -52,7 +68,7 @@ app.get('/api/health', (req, res) => {
 // ===== MONGODB CONNECTION =====
 async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/livreo');
+    await mongoose.connect(mongoUrl);
     console.log('✅ MongoDB connecté');
     seedSampleData();
     seedCategories();
