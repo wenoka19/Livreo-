@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 
 // PUT update a setting (admin only)
 router.put('/:key', async (req, res) => {
-  if (!req.session?.adminId) return res.status(401).json({ message: 'Non autorisé' });
+  if (!req.session?.isAdmin) return res.status(401).json({ message: 'Non autorisé' });
   try {
     const setting = await SiteSetting.findOneAndUpdate(
       { key: req.params.key },
@@ -31,7 +31,7 @@ router.put('/:key', async (req, res) => {
 
 // PUT bulk update settings (admin only)
 router.put('/', async (req, res) => {
-  if (!req.session?.adminId) return res.status(401).json({ message: 'Non autorisé' });
+  if (!req.session?.isAdmin) return res.status(401).json({ message: 'Non autorisé' });
   try {
     const updates = req.body; // { key: value, ... }
     const ops = Object.entries(updates).map(([key, value]) => ({

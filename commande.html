@@ -150,11 +150,9 @@
         Cart.clearCart();
         window.location.href = `confirmation.html?id=${order._id || order.id}&num=${order.orderNumber || order._id}`;
       } catch (err) {
-        // If API unavailable, simulate success with fake order
-        const fakeNum = 'LV-' + Date.now().toString().slice(-6);
-        Cart.clearCart();
-        window.location.href = `confirmation.html?num=${fakeNum}`;
-      } finally {
+        const errorEl = document.getElementById('form-error');
+        errorEl.style.display = 'block';
+        errorEl.textContent = err.message || 'Erreur lors de la commande. Veuillez réessayer.';
         btn.disabled = false;
         btn.textContent = 'Confirmer la commande';
       }

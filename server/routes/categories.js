@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 
 // POST create category (admin only)
 router.post('/', async (req, res) => {
-  if (!req.session?.adminId) return res.status(401).json({ message: 'Non autorisé' });
+  if (!req.session?.isAdmin) return res.status(401).json({ message: 'Non autorisé' });
   try {
     const category = new Category({ name: req.body.name?.trim() });
     await category.save();
@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
 
 // PUT update category (admin only)
 router.put('/:id', async (req, res) => {
-  if (!req.session?.adminId) return res.status(401).json({ message: 'Non autorisé' });
+  if (!req.session?.isAdmin) return res.status(401).json({ message: 'Non autorisé' });
   try {
     const category = await Category.findByIdAndUpdate(
       req.params.id,
@@ -42,7 +42,7 @@ router.put('/:id', async (req, res) => {
 
 // DELETE category (admin only)
 router.delete('/:id', async (req, res) => {
-  if (!req.session?.adminId) return res.status(401).json({ message: 'Non autorisé' });
+  if (!req.session?.isAdmin) return res.status(401).json({ message: 'Non autorisé' });
   try {
     const category = await Category.findByIdAndDelete(req.params.id);
     if (!category) return res.status(404).json({ message: 'Catégorie introuvable' });

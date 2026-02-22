@@ -7,7 +7,7 @@ router.post('/', async (req, res) => {
   try {
     const { customer, items, total } = req.body;
 
-    if (!customer || !customer.name || !customer.phone || !customer.address || !customer.city) {
+    if (!customer || !customer.name || !customer.phone || !customer.address) {
       return res.status(400).json({ message: 'Informations client incomplètes' });
     }
     if (!items || items.length === 0) {

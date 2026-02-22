@@ -25,6 +25,11 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
 
+function requireAdmin(req, res, next) {
+  if (req.session?.isAdmin) return next();
+  res.status(401).json({ message: 'Non autorisé' });
+}
+
 // GET /api/books — list with filters
 router.get('/', async (req, res) => {
   try {
@@ -72,7 +77,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/books — create (admin only)
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', requireAdmin, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
     if (req.file) data.image = req.file.filename;
@@ -91,7 +96,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 });
 
 // PUT /api/books/:id — update (admin only)
-router.put('/:id', upload.single('image'), async (req, res) => {
+router.put('/:id', requireAdmin, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
     if (req.file) data.image = req.file.filename;
@@ -110,7 +115,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 });
 
 // DELETE /api/books/:id — delete (admin only)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAdmin, async (req, res) => {
   try {
     const book = await Book.findByIdAndDelete(req.params.id);
     if (!book) return res.status(404).json({ message: 'Livre introuvable' });
