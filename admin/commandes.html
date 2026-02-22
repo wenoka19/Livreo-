@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des commandes — Livreo Admin</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <h1 class="admin-topbar-title">Gestion des commandes</h1>
+      <div class="admin-topbar-right">
+        <div class="admin-user-badge">
+          <div class="admin-user-avatar">A</div>
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Filter bar -->
+      <div class="admin-search-bar">
+        <select class="admin-select" id="filter-status">
+          <option value="">Tous les statuts</option>
+          <option value="En attente">En attente</option>
+          <option value="Confirmé">Confirmé</option>
+          <option value="Livré">Livré</option>
+        </select>
+        <button class="btn-admin-secondary" id="btn-refresh">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Actualiser
+        </button>
+      </div>
+
+      <!-- Orders table -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2 class="admin-card-title">Commandes (<span id="orders-count">0</span>)</h2>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>N° Commande</th>
+                <th>Client</th>
+                <th>Téléphone</th>
+                <th>Ville</th>
+                <th>Articles</th>
+                <th>Total</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+              <tr><td colspan="9" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="orders-pagination" style="padding:var(--space-md);"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div class="modal-overlay" id="order-modal">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Détail de la commande</h2>
+        <button class="modal-close" id="order-modal-close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="order-detail-content"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="admin-toast"></div>
+
+  <script src="../js/admin.js"></script>
+  <script>
+    let currentPage = 1;
+    let ordersData = [];
+
+    async function loadOrders(page = 1) {
+      const status = document.getElementById('filter-status').value;
+      const query = new URLSearchParams({ status, page, limit: 20 }).toString();
+
+      try {
+        const res = await fetch(`/api/orders?${query}`);
+        const data = await res.json();
+        ordersData = data.orders || data;
+        const total = data.total || ordersData.length;
+        document.getElementById('orders-count').textContent = total;
+        renderOrders(ordersData);
+        renderPagination(Math.ceil(total / 20), page);
+      } catch {
+        document.getElementById('orders-tbody').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:var(--space-xl);">Erreur de chargement</td></tr>`;
+      }
+    }
+
+    function renderOrders(orders) {
+      const tbody = document.getElementById('orders-tbody');
+      if (!orders.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Aucune commande</td></tr>';
+        return;
+      }
+      tbody.innerHTML = orders.map(o => `
+        <tr>
+          <td><strong>${o.orderNumber || o._id?.slice(-6)}</strong></td>
+          <td>${o.customer?.name || '—'}</td>
+          <td>${o.customer?.phone || '—'}</td>
+          <td>${o.customer?.city || '—'}</td>
+          <td>${o.items?.length || 0} article(s)</td>
+          <td>${(o.total || 0).toLocaleString('fr-FR')} FCFA</td>
+          <td>${AdminUtils.statusBadge(o.status)}</td>
+          <td>${o.createdAt ? AdminUtils.formatDate(o.createdAt) : '—'}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-icon edit" onclick="viewOrder('${o._id}')" title="Voir détails">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              ${o.status === 'En attente' ? `
+              <button class="btn-icon" style="background:#E3F2FD;color:#1565C0;" onclick="updateStatus('${o._id}', 'Confirmé')" title="Confirmer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+              </button>` : ''}
+              ${o.status === 'Confirmé' ? `
+              <button class="btn-icon" style="background:var(--color-primary-bg);color:var(--color-primary);" onclick="updateStatus('${o._id}', 'Livré')" title="Marquer livré">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </button>` : ''}
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    function renderPagination(total, current) {
+      const el = document.getElementById('orders-pagination');
+      if (total <= 1) { el.innerHTML = ''; return; }
+      let html = '';
+      for (let i = 1; i <= total; i++) {
+        html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="currentPage=${i};loadOrders(${i})">${i}</button>`;
+      }
+      el.innerHTML = html;
+    }
+
+    async function updateStatus(id, newStatus) {
+      try {
+        const res = await fetch(`/api/orders/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus }),
+        });
+        if (!res.ok) throw new Error('Erreur');
+        AdminUtils.showAdminToast(`Statut mis à jour : ${newStatus}`, 'success');
+        loadOrders(currentPage);
+      } catch {
+        AdminUtils.showAdminToast('Erreur lors de la mise à jour', 'error');
+      }
+    }
+
+    function viewOrder(id) {
+      const order = ordersData.find(o => o._id === id);
+      if (!order) return;
+
+      const content = document.getElementById('order-detail-content');
+      content.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg);margin-bottom:var(--space-lg);">
+          <div>
+            <p style="font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-bottom:4px;">Numéro de commande</p>
+            <p style="font-weight:bold;">${order.orderNumber || order._id}</p>
+          </div>
+          <div>
+            <p style="font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-bottom:4px;">Statut</p>
+            ${AdminUtils.statusBadge(order.status)}
+          </div>
+          <div>
+            <p style="font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-bottom:4px;">Client</p>
+            <p style="font-weight:500;">${order.customer?.name}</p>
+          </div>
+          <div>
+            <p style="font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-bottom:4px;">Téléphone</p>
+            <p>${order.customer?.phone}</p>
+          </div>
+          <div style="grid-column:1/-1;">
+            <p style="font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-bottom:4px;">Adresse</p>
+            <p>${order.customer?.address}, ${order.customer?.city}</p>
+          </div>
+          ${order.customer?.note ? `<div style="grid-column:1/-1;"><p style="font-size:var(--font-size-xs);color:var(--color-text-secondary);margin-bottom:4px;">Note</p><p>${order.customer.note}</p></div>` : ''}
+        </div>
+        <div style="border-top:1px solid var(--color-border);padding-top:var(--space-lg);margin-bottom:var(--space-lg);">
+          <p style="font-weight:var(--font-weight-semibold);margin-bottom:var(--space-md);">Articles commandés</p>
+          ${(order.items || []).map(item => `
+            <div style="display:flex;justify-content:space-between;padding:var(--space-sm) 0;border-bottom:1px solid var(--color-surface);">
+              <span>${item.title} × ${item.qty}</span>
+              <span style="font-weight:500;">${(item.price * item.qty).toLocaleString('fr-FR')} FCFA</span>
+            </div>`).join('')}
+          <div style="display:flex;justify-content:space-between;margin-top:var(--space-md);font-weight:bold;font-size:var(--font-size-md);">
+            <span>Total</span>
+            <span style="color:var(--color-primary);">${(order.total || 0).toLocaleString('fr-FR')} FCFA</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;">
+          ${order.status === 'En attente' ? `<button class="btn-admin-primary" onclick="updateStatus('${order._id}','Confirmé');document.getElementById('order-modal').classList.remove('open')">✓ Confirmer la commande</button>` : ''}
+          ${order.status === 'Confirmé' ? `<button class="btn-admin-primary" onclick="updateStatus('${order._id}','Livré');document.getElementById('order-modal').classList.remove('open')">🚚 Marquer comme livré</button>` : ''}
+          <a href="https://wa.me/${order.customer?.phone?.replace(/[^0-9]/g,'')}" target="_blank" class="btn-admin-secondary">WhatsApp client</a>
+        </div>`;
+
+      document.getElementById('order-modal').classList.add('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      AdminUtils.initAdminSidebar();
+      await AdminUtils.requireAdminAuth();
+      loadOrders();
+
+      document.getElementById('filter-status').addEventListener('change', () => loadOrders(1));
+      document.getElementById('btn-refresh').addEventListener('click', () => loadOrders(currentPage));
+      document.getElementById('order-modal-close').addEventListener('click', () => document.getElementById('order-modal').classList.remove('open'));
+
+      // Handle ?id= param (from dashboard)
+      const urlId = new URLSearchParams(window.location.search).get('id');
+      if (urlId) {
+        setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/orders/${urlId}`);
+            if (res.ok) {
+              const order = await res.json();
+              ordersData = [order];
+              viewOrder(urlId);
+            }
+          } catch {}
+        }, 800);
+      }
+    });
+  </script>
+</body>
+</html>

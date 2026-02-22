@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogue — Livreo</title>
+  <meta name="description" content="Parcourez notre catalogue complet de livres. Filtrez par catégorie, genre, prix.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <main>
+    <div class="catalogue-header">
+      <div class="container">
+        <h1 class="catalogue-title">Catalogue</h1>
+        <nav class="breadcrumb">
+          <a href="index.html">Accueil</a>
+          <span class="breadcrumb-sep">/</span>
+          <span id="breadcrumb-current">Catalogue</span>
+        </nav>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="catalogue-layout">
+
+        <!-- Sidebar Filters -->
+        <aside class="filters-sidebar">
+          <h2 style="font-size:var(--font-size-md);font-weight:var(--font-weight-bold);margin-bottom:var(--space-xl);">Filtres</h2>
+
+          <div class="filter-group">
+            <span class="filter-label">Catégorie</span>
+            <div class="filter-options" id="category-filters">
+              <label class="filter-option"><input type="radio" name="cat" value=""> Toutes</label>
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- Books Grid -->
+        <div>
+          <div class="catalogue-toolbar">
+            <p class="catalogue-count" id="catalogue-count">Chargement...</p>
+            <select class="sort-select" id="sort-select">
+              <option value="">Pertinence</option>
+              <option value="newest">Plus récents</option>
+              <option value="price_asc">Prix croissant</option>
+              <option value="price_desc">Prix décroissant</option>
+              <option value="popular">Popularité</option>
+            </select>
+          </div>
+
+          <div class="books-grid" id="catalogue-grid">
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+            <div style="background:var(--color-surface);border-radius:12px;height:340px;animation:pulse 1.5s infinite;"></div>
+          </div>
+
+          <div class="pagination" id="pagination"></div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast"></div>
+
+  <style>
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.5} }
+  </style>
+
+  <script src="js/components.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/catalogue.js"></script>
+</body>
+</html>

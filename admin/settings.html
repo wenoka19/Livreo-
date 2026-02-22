@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres — Livreo Admin</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <h1 class="admin-topbar-title">Paramètres du site</h1>
+      <div class="admin-topbar-right">
+        <button class="btn-admin-primary" id="btn-save-settings">Enregistrer les modifications</button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Section titles -->
+      <div class="admin-card" style="margin-bottom:var(--space-xl);">
+        <div class="admin-card-header">
+          <h2 class="admin-card-title">Titres des sections (page d'accueil)</h2>
+        </div>
+        <div style="padding:var(--space-lg);display:flex;flex-direction:column;gap:var(--space-lg);">
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Titre section 1 (Dernières parutions)</label>
+            <input type="text" id="s-title-1" class="admin-search-input" style="width:100%;" placeholder="Dernières parutions">
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Titre section 2 (Meilleurs livres)</label>
+            <input type="text" id="s-title-2" class="admin-search-input" style="width:100%;" placeholder="Les meilleurs livres du moment">
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Titre section 3 (Nouveaux livres)</label>
+            <input type="text" id="s-title-3" class="admin-search-input" style="width:100%;" placeholder="Nouveaux livres">
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Titre catégorie 1 (Romans)</label>
+            <input type="text" id="s-cat1" class="admin-search-input" style="width:100%;" placeholder="Romans">
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Titre catégorie 2 (Développement personnel)</label>
+            <input type="text" id="s-cat2" class="admin-search-input" style="width:100%;" placeholder="Développement personnel">
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero featured books -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2 class="admin-card-title">Livres mis en avant (Hero Banner)</h2>
+        </div>
+        <div style="padding:var(--space-lg);">
+          <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);margin-bottom:var(--space-lg);">
+            Ces 4 livres s'affichent dans la bannière hero de la page d'accueil. Cochez "Mis en avant Hero" sur les livres de votre choix depuis la page <a href="livres.html" style="color:var(--color-primary);">Gestion des livres</a>.
+          </p>
+          <div id="hero-books-preview" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:var(--space-md);">
+            <p style="color:var(--color-text-secondary);">Chargement...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="admin-toast"></div>
+
+  <script src="../js/admin.js"></script>
+  <script>
+    async function loadSettings() {
+      try {
+        const res = await fetch('/api/settings');
+        const settings = await res.json();
+        document.getElementById('s-title-1').value = settings.home_section_1_title || '';
+        document.getElementById('s-title-2').value = settings.home_section_2_title || '';
+        document.getElementById('s-title-3').value = settings.home_section_3_title || '';
+        document.getElementById('s-cat1').value = settings.home_section_cat1_title || '';
+        document.getElementById('s-cat2').value = settings.home_section_cat2_title || '';
+      } catch {
+        AdminUtils.showAdminToast('Erreur de chargement des paramètres', 'error');
+      }
+    }
+
+    async function saveSettings() {
+      const updates = {
+        home_section_1_title: document.getElementById('s-title-1').value.trim(),
+        home_section_2_title: document.getElementById('s-title-2').value.trim(),
+        home_section_3_title: document.getElementById('s-title-3').value.trim(),
+        home_section_cat1_title: document.getElementById('s-cat1').value.trim(),
+        home_section_cat2_title: document.getElementById('s-cat2').value.trim(),
+      };
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates),
+        });
+        if (!res.ok) throw new Error('Erreur');
+        AdminUtils.showAdminToast('Paramètres enregistrés !', 'success');
+      } catch {
+        AdminUtils.showAdminToast('Erreur lors de la sauvegarde', 'error');
+      }
+    }
+
+    async function loadHeroBooksPreview() {
+      const container = document.getElementById('hero-books-preview');
+      try {
+        const res = await fetch('/api/books?heroFeatured=true&limit=4');
+        const data = await res.json();
+        const books = data.books || data;
+        if (!books.length) {
+          container.innerHTML = '<p style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">Aucun livre sélectionné pour le hero. Cochez "Mis en avant Hero" sur des livres dans <a href="livres.html" style="color:var(--color-primary);">Gestion des livres</a>.</p>';
+          return;
+        }
+        container.innerHTML = books.map(b => {
+          const img = b.image ? '/uploads/' + b.image : 'https://via.placeholder.com/140x210/E8F5E9/2E7D32?text=📚';
+          return '<div style="text-align:center;">' +
+            '<img src="' + img + '" alt="' + b.title + '" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);" onerror="this.src=\'https://via.placeholder.com/140x210/E8F5E9/2E7D32?text=📚\'">' +
+            '<p style="font-size:0.7rem;font-weight:600;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + b.title + '</p>' +
+            '<p style="font-size:0.65rem;color:var(--color-primary);">' + (b.promoPrice || 0).toLocaleString('fr-FR') + ' FCFA</p>' +
+            '</div>';
+        }).join('');
+      } catch {
+        container.innerHTML = '<p style="color:var(--color-error);font-size:var(--font-size-sm);">Erreur de chargement</p>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      AdminUtils.initAdminSidebar();
+      await AdminUtils.requireAdminAuth();
+      loadSettings();
+      loadHeroBooksPreview();
+
+      document.getElementById('btn-save-settings').addEventListener('click', saveSettings);
+    });
+  </script>
+</body>
+</html>

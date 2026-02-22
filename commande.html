@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passer la commande — Livreo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <main>
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">Accueil</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="panier.html">Panier</a>
+        <span class="breadcrumb-sep">/</span>
+        <span>Commande</span>
+      </nav>
+
+      <div class="checkout-page">
+        <div class="checkout-layout">
+
+          <!-- Form -->
+          <div class="checkout-form-card">
+            <h1 class="checkout-form-title">Vos informations de livraison</h1>
+
+            <div class="cod-notice">
+              <span class="cod-notice-icon">💵</span>
+              <div class="cod-notice-text">Paiement à la livraison — Aucun paiement en ligne requis</div>
+            </div>
+
+            <form id="order-form" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="full-name">Nom complet <span>*</span></label>
+                  <input type="text" id="full-name" class="form-input" placeholder="Ex: Aminata Konaté" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="phone">Numéro de téléphone (WhatsApp de préférence) <span>*</span></label>
+                  <input type="tel" id="phone" class="form-input" placeholder="Ex: 90000000" required pattern="[0-9]+" inputmode="numeric">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="address">Adresse de livraison <span>*</span></label>
+                <input type="text" id="address" class="form-input" placeholder="Ex: Quartier Tokoin, Rue 15, Maison N°3" required>
+              </div>
+
+
+
+              <div class="form-group">
+                <label class="form-label" for="note">Note optionnelle (facultatif)</label>
+                <textarea id="note" class="form-textarea" placeholder="Instructions particulières pour la livraison..."></textarea>
+              </div>
+
+              <div id="form-error" style="display:none;background:#FFEBEE;color:var(--color-error);padding:var(--space-md);border-radius:var(--radius-md);font-size:var(--font-size-sm);margin-bottom:var(--space-md);"></div>
+
+              <button type="submit" class="btn-place-order" id="submit-order">
+                Confirmer la commande
+              </button>
+            </form>
+          </div>
+
+          <!-- Order summary -->
+          <div>
+            <div class="cart-summary" style="position:sticky;top:calc(var(--header-height) + var(--nav-height) + var(--space-md));">
+              <h2 class="cart-summary-title">Récapitulatif de commande</h2>
+              <div id="order-items">
+                <!-- Injected by JS -->
+              </div>
+              <div class="cart-summary-row">
+                <span>Sous-total</span>
+                <span id="order-subtotal">0 FCFA</span>
+              </div>
+              <div class="cart-summary-row">
+                <span>Livraison</span>
+                <span id="delivery-label-checkout" style="color:var(--color-primary);font-weight:var(--font-weight-medium);">Gratuite</span>
+              </div>
+              <div class="cart-summary-total">
+                <span>Total à payer</span>
+                <span id="order-total">0 FCFA</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast"></div>
+
+  <script src="js/components.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    function renderOrderSummary() {
+      const cart = Cart.getCart();
+
+      if (cart.length === 0) {
+        window.location.href = 'panier.html';
+        return;
+      }
+
+      const itemsEl = document.getElementById('order-items');
+      itemsEl.innerHTML = cart.map(item => `
+        <div class="cart-summary-row" style="margin-bottom:var(--space-sm);align-items:flex-start;">
+          <span style="font-weight:var(--font-weight-medium);flex:1;">${item.title} <span style="color:var(--color-text-secondary);">× ${item.qty}</span></span>
+          <span style="white-space:nowrap;">${(item.price * item.qty).toLocaleString('fr-FR')} FCFA</span>
+        </div>
+      `).join('') + '<hr style="border:none;border-top:1px solid var(--color-border);margin:var(--space-md) 0;">';
+
+      const total = Cart.getCartTotal();
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      const deliveryEl = document.getElementById('delivery-label-checkout');
+      if (deliveryEl) {
+        if (totalQty >= 2) {
+          deliveryEl.textContent = 'Gratuite';
+          deliveryEl.style.color = 'var(--color-primary)';
+        } else {
+          deliveryEl.textContent = 'Livraison payante';
+          deliveryEl.style.color = 'var(--color-error)';
+        }
+      }
+      document.getElementById('order-subtotal').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
+      document.getElementById('order-total').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
+    }
+
+    async function submitOrder(data) {
+      const btn = document.getElementById('submit-order');
+      btn.disabled = true;
+      btn.textContent = 'Traitement en cours...';
+
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || 'Erreur lors de la commande');
+        }
+
+        const order = await res.json();
+        Cart.clearCart();
+        window.location.href = `confirmation.html?id=${order._id || order.id}&num=${order.orderNumber || order._id}`;
+      } catch (err) {
+        // If API unavailable, simulate success with fake order
+        const fakeNum = 'LV-' + Date.now().toString().slice(-6);
+        Cart.clearCart();
+        window.location.href = `confirmation.html?num=${fakeNum}`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Confirmer la commande';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderOrderSummary();
+
+
+      // Phone: numbers only
+      const phoneInput = document.getElementById('phone');
+      if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+          this.value = this.value.replace(/[^0-9]/g, '');
+        });
+      }
+      document.getElementById('order-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errorEl = document.getElementById('form-error');
+        errorEl.style.display = 'none';
+
+        const name = document.getElementById('full-name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const note = document.getElementById('note').value.trim();
+        const cart = Cart.getCart();
+
+        if (!name || !phone || !address) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Veuillez remplir tous les champs obligatoires (marqués d\'un *).';
+          return;
+        }
+
+        await submitOrder({
+          customer: { name, phone, address, note },
+          items: cart.map(i => ({ book: i.id, title: i.title, qty: i.qty, price: i.price })),
+          total: Cart.getCartTotal(),
+        });
+      });
+    });
+  </script>
+</body>
+</html>

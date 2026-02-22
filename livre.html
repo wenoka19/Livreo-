@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Détail du livre — Livreo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <main>
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">Accueil</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="catalogue.html">Catalogue</a>
+        <span class="breadcrumb-sep">/</span>
+        <span id="breadcrumb-title">Détail</span>
+      </nav>
+
+      <div class="book-detail" id="book-detail-section">
+        <div class="book-detail-layout">
+          <!-- Cover -->
+          <div class="book-detail-cover">
+            <img id="book-cover" src="https://via.placeholder.com/300x450/E8F5E9/2E7D32?text=📚" alt="Couverture du livre">
+          </div>
+
+          <!-- Info -->
+          <div class="book-detail-info">
+            <span class="badge-category" id="book-category">Catégorie</span>
+            <h1 class="book-detail-title" id="book-title">Chargement...</h1>
+            <p class="book-detail-author" id="book-author">Auteur</p>
+
+            <div class="book-detail-pricing">
+              <span class="price-original" id="book-original-price"></span>
+              <span class="price-promo" id="book-promo-price">0 FCFA</span>
+            </div>
+
+            <div class="book-quantity">
+              <button class="qty-btn" id="qty-minus">−</button>
+              <span class="qty-value" id="qty-value">1</span>
+              <button class="qty-btn" id="qty-plus">+</button>
+              <span style="font-size:var(--font-size-sm);color:var(--color-text-secondary);" id="stock-label"></span>
+            </div>
+
+            <button class="btn-add-cart-lg" id="btn-add-to-cart">
+              🛒 Commander
+            </button>
+
+            <div class="book-detail-description" id="book-description-section" style="display:none;">
+              <h3>Description</h3>
+              <p id="book-description"></p>
+            </div>
+
+            <div style="margin-top:var(--space-xl);padding-top:var(--space-xl);border-top:1px solid var(--color-border);">
+              <div style="display:flex;flex-direction:column;gap:var(--space-sm);">
+                <div style="display:flex;align-items:center;gap:var(--space-sm);font-size:var(--font-size-sm);">
+                  <span style="color:var(--color-primary);">✓</span>
+                  <span>Paiement à la livraison uniquement</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-sm);font-size:var(--font-size-sm);">
+                  <span style="color:var(--color-primary);">✓</span>
+                  <span>Livraison à domicile sous 24–72h</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-sm);font-size:var(--font-size-sm);">
+                  <span style="color:var(--color-primary);">✓</span>
+                  <span>Livre physique garanti</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related books -->
+      <div style="margin-top:var(--space-3xl);padding-top:var(--space-xl);border-top:1px solid var(--color-border);">
+        <div class="section-header">
+          <h2 class="section-title">Vous aimerez aussi</h2>
+        </div>
+        <div class="book-row" id="related-books">
+          <div style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast"></div>
+
+  <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}</style>
+
+  <script src="js/components.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let bookData = null;
+    let qty = 1;
+
+    async function loadBookDetail() {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { window.location.href = 'catalogue.html'; return; }
+
+      try {
+        const res = await fetch(`/api/books/${id}`);
+        if (!res.ok) throw new Error('Not found');
+        bookData = await res.json();
+      } catch {
+        // Fallback sample
+        bookData = (window.SAMPLE_BOOKS || []).find(b => b.id === id) || {
+          id, title: 'Livre introuvable', author: '—', category: '—',
+          originalPrice: 0, promoPrice: 0, image: '', description: '', stock: 0
+        };
+      }
+      renderBook(bookData);
+    }
+
+    function renderBook(book) {
+      const imgSrc = book.image
+        ? (book.image.startsWith('http') ? book.image : `/uploads/${book.image}`)
+        : 'https://via.placeholder.com/300x450/E8F5E9/2E7D32?text=📚';
+
+      document.title = `${book.title} — Livreo`;
+      document.getElementById('breadcrumb-title').textContent = book.title;
+      document.getElementById('book-cover').src = imgSrc;
+      document.getElementById('book-cover').alt = book.title;
+      document.getElementById('book-category').textContent = book.category || 'Livre';
+      document.getElementById('book-title').textContent = book.title;
+      document.getElementById('book-author').textContent = book.author;
+
+      const promo = book.promoPrice || book.price || 0;
+      const original = book.originalPrice;
+      document.getElementById('book-promo-price').textContent = `${promo.toLocaleString('fr-FR')} FCFA`;
+      if (original && original > promo) {
+        document.getElementById('book-original-price').textContent = `${original.toLocaleString('fr-FR')} FCFA`;
+      }
+
+      if (book.stock !== undefined) {
+        document.getElementById('stock-label').textContent = book.stock > 0 ? `(${book.stock} en stock)` : '(Rupture de stock)';
+      }
+
+      if (book.description) {
+        document.getElementById('book-description').textContent = book.description;
+        document.getElementById('book-description-section').style.display = 'block';
+      }
+
+      // Load related
+      loadBooks('related-books', { category: book.category });
+    }
+
+    function initQuantity() {
+      document.getElementById('qty-minus').addEventListener('click', () => {
+        if (qty > 1) { qty--; document.getElementById('qty-value').textContent = qty; }
+      });
+      document.getElementById('qty-plus').addEventListener('click', () => {
+        qty++;
+        document.getElementById('qty-value').textContent = qty;
+      });
+      document.getElementById('btn-add-to-cart').addEventListener('click', function() {
+        if (!bookData) return;
+        const promo = bookData.promoPrice || bookData.price || 0;
+        const imgSrc = bookData.image
+          ? (bookData.image.startsWith('http') ? bookData.image : `/uploads/${bookData.image}`)
+          : '';
+        Cart.addToCart({
+          id: bookData._id || bookData.id,
+          title: bookData.title,
+          author: bookData.author,
+          price: promo,
+          image: imgSrc,
+          qty
+        });
+        // Visual feedback
+        const btn = this;
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✓ Ajouté !';
+        btn.style.background = '#388E3C';
+        btn.disabled = true;
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 2000);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadBookDetail();
+      initQuantity();
+    });
+  </script>
+</body>
+</html>

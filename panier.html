@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Panier — Livreo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <main>
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html">Accueil</a>
+        <span class="breadcrumb-sep">/</span>
+        <span>Mon panier</span>
+      </nav>
+
+      <h1 style="font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold);margin-bottom:var(--space-xl);">Mon panier</h1>
+
+      <!-- Empty cart -->
+      <div class="cart-empty hidden" id="cart-empty">
+        <div class="cart-empty-icon">🛒</div>
+        <h2>Votre panier est vide</h2>
+        <p>Parcourez notre catalogue et ajoutez des livres à votre panier.</p>
+        <a href="catalogue.html" class="btn-primary">Parcourir le catalogue</a>
+      </div>
+
+      <!-- Cart with items -->
+      <div class="cart-page" id="cart-with-items">
+        <div class="cart-layout">
+          <div>
+            <div class="cart-items" id="cart-items-list">
+              <!-- Items injected by JS -->
+            </div>
+          </div>
+
+          <div class="cart-summary">
+            <h2 class="cart-summary-title">Récapitulatif</h2>
+            <div class="cart-summary-row">
+              <span>Sous-total</span>
+              <span id="cart-subtotal">0 FCFA</span>
+            </div>
+            <div class="cart-summary-row">
+              <span>Livraison</span>
+              <span id="delivery-label" style="color:var(--color-primary);font-weight:var(--font-weight-medium);">Gratuite</span>
+            </div>
+            <div class="cart-summary-row">
+              <span>Paiement</span>
+              <span>À la livraison</span>
+            </div>
+            <div class="cart-summary-total">
+              <span>Total</span>
+              <span id="cart-total">0 FCFA</span>
+            </div>
+
+            <div class="cod-notice" style="margin-bottom:var(--space-lg);">
+              <span class="cod-notice-icon">💵</span>
+              <span class="cod-notice-text">Paiement en espèces à la réception de votre commande</span>
+            </div>
+
+            <a href="commande.html" class="btn-checkout" id="btn-checkout">
+              Passer la commande →
+            </a>
+
+            <a href="catalogue.html" class="section-link" style="justify-content:center;margin-top:var(--space-md);">
+              ← Continuer mes achats
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <div class="toast" id="toast"></div>
+
+  <script src="js/components.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    function renderCartItem(item) {
+      const imgSrc = item.image || 'https://via.placeholder.com/80x120/E8F5E9/2E7D32?text=📚';
+      return `
+      <div class="cart-item" data-id="${item.id}">
+        <div class="cart-item-image">
+          <img src="${imgSrc}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/80x120/E8F5E9/2E7D32?text=📚'">
+        </div>
+        <div class="cart-item-info">
+          <h3 class="cart-item-title">${item.title}</h3>
+          <p class="cart-item-author">${item.author}</p>
+          <p class="cart-item-price">${(item.price * item.qty).toLocaleString('fr-FR')} FCFA</p>
+          <div class="cart-item-controls">
+            <button class="qty-btn" onclick="changeQty('${item.id}', ${item.qty - 1})">−</button>
+            <span class="qty-value">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty('${item.id}', ${item.qty + 1})">+</button>
+            <span style="color:var(--color-text-secondary);font-size:var(--font-size-sm);">× ${item.price.toLocaleString('fr-FR')} FCFA</span>
+            <button class="btn-remove" onclick="removeItem('${item.id}')" title="Supprimer" style="display:flex;align-items:center;justify-content:center;min-width:32px;min-height:32px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function renderCart() {
+      const cart = Cart.getCart();
+      const emptyEl = document.getElementById('cart-empty');
+      const withItemsEl = document.getElementById('cart-with-items');
+      const listEl = document.getElementById('cart-items-list');
+
+      if (cart.length === 0) {
+        emptyEl.classList.remove('hidden');
+        withItemsEl.classList.add('hidden');
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      withItemsEl.classList.remove('hidden');
+      listEl.innerHTML = cart.map(renderCartItem).join('');
+
+      const total = Cart.getCartTotal();
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      const deliveryEl = document.getElementById('delivery-label');
+      if (deliveryEl) {
+        if (totalQty >= 2) {
+          deliveryEl.textContent = 'Gratuite';
+          deliveryEl.style.color = 'var(--color-primary)';
+        } else {
+          deliveryEl.textContent = 'Livraison payante';
+          deliveryEl.style.color = 'var(--color-error)';
+        }
+      }
+      document.getElementById('cart-subtotal').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
+      document.getElementById('cart-total').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
+    }
+
+    function changeQty(id, newQty) {
+      if (newQty < 1) { removeItem(id); return; }
+      Cart.updateQty(id, newQty);
+      renderCart();
+    }
+
+    function removeItem(id) {
+      Cart.removeFromCart(id);
+      renderCart();
+      Cart.showToast('Livre retiré du panier', '');
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCart);
+  </script>
+</body>
+</html>

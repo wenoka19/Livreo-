@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande confirmée — Livreo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <main>
+    <div class="container">
+      <div class="confirmation-page">
+
+        <div class="confirmation-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+
+        <h1 class="confirmation-title">Commande confirmée !</h1>
+        <p class="confirmation-subtitle">
+          Merci pour votre commande. Nous vous contacterons très prochainement pour organiser la livraison.
+        </p>
+
+        <div class="confirmation-order-num">
+          <p class="order-num-label">Numéro de commande</p>
+          <p class="order-num-value" id="order-number">—</p>
+        </div>
+
+        <div style="max-width:480px;margin:0 auto var(--space-xl);background:var(--color-surface);border-radius:var(--radius-lg);padding:var(--space-xl);text-align:left;">
+          <h3 style="font-weight:var(--font-weight-semibold);margin-bottom:var(--space-md);">Et maintenant ?</h3>
+          <div style="display:flex;flex-direction:column;gap:var(--space-md);">
+            <div style="display:flex;gap:var(--space-md);align-items:flex-start;">
+              <span style="background:var(--color-primary);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--font-size-sm);font-weight:bold;flex-shrink:0;">1</span>
+              <div>
+                <p style="font-weight:var(--font-weight-medium);">Confirmation</p>
+                <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">Notre équipe confirme votre commande par téléphone</p>
+              </div>
+            </div>
+            <div style="display:flex;gap:var(--space-md);align-items:flex-start;">
+              <span style="background:var(--color-primary);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--font-size-sm);font-weight:bold;flex-shrink:0;">2</span>
+              <div>
+                <p style="font-weight:var(--font-weight-medium);">Préparation</p>
+                <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">Vos livres sont soigneusement emballés</p>
+              </div>
+            </div>
+            <div style="display:flex;gap:var(--space-md);align-items:flex-start;">
+              <span style="background:var(--color-primary);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:var(--font-size-sm);font-weight:bold;flex-shrink:0;">3</span>
+              <div>
+                <p style="font-weight:var(--font-weight-medium);">Livraison</p>
+                <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">Livraison à domicile sous 24–72h. Paiement en espèces à la réception.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap;">
+          <a href="catalogue.html" class="btn-primary">Continuer mes achats</a>
+          <a href="https://wa.me/22893460079" target="_blank" class="btn-secondary">
+            Contacter sur WhatsApp
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="js/components.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const num = params.get('num') || params.get('id') || '—';
+      document.getElementById('order-number').textContent = num;
+    });
+  </script>
+</body>
+</html>

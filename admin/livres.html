@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des livres — Livreo Admin</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <h1 class="admin-topbar-title">Gestion des livres</h1>
+      <div class="admin-topbar-right">
+        <button class="btn-admin-primary" id="btn-add-book">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Ajouter un livre
+        </button>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Search -->
+      <div class="admin-search-bar">
+        <input type="text" class="admin-search-input" id="search-books" placeholder="Rechercher un livre ou auteur...">
+        <select class="admin-select" id="filter-category">
+          <option value="">Toutes les catégories</option>
+        </select>
+        <button class="btn-admin-secondary" id="btn-search-books">Rechercher</button>
+      </div>
+
+      <!-- Books table -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2 class="admin-card-title">Catalogue (<span id="books-count">0</span> livres)</h2>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Couverture</th>
+                <th>Titre</th>
+                <th>Auteur</th>
+                <th>Catégorie</th>
+                <th>Prix</th>
+                <th>Promo</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="books-tbody">
+              <tr><td colspan="8" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="books-pagination" style="padding:var(--space-md);"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add/Edit Book Modal -->
+  <div class="modal-overlay" id="book-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Ajouter un livre</h2>
+        <button class="modal-close" id="modal-close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="book-form" enctype="multipart/form-data">
+        <input type="hidden" id="book-id">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md);">
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Titre *</label>
+            <input type="text" id="f-title" class="admin-search-input" style="width:100%;" required placeholder="Titre du livre">
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Auteur *</label>
+            <input type="text" id="f-author" class="admin-search-input" style="width:100%;" required placeholder="Nom de l'auteur">
+          </div>
+        </div>
+
+        <div style="margin-bottom:var(--space-md);">
+          <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Description</label>
+          <textarea id="f-description" style="width:100%;padding:var(--space-sm);border:1px solid var(--color-border);border-radius:var(--radius-md);min-height:80px;font-family:var(--font-family);" placeholder="Description du livre..."></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md);">
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Catégorie *</label>
+            <select id="f-category" class="admin-select" style="width:100%;" required>
+              <option value="">Sélectionner...</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Genre</label>
+            <input type="text" id="f-genre" class="admin-search-input" style="width:100%;" placeholder="Ex: Contemporain">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-md);margin-bottom:var(--space-md);">
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Prix original (FCFA) *</label>
+            <input type="number" id="f-orig-price" class="admin-search-input" style="width:100%;" required min="0" placeholder="5000">
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Prix promo (FCFA) *</label>
+            <input type="number" id="f-promo-price" class="admin-search-input" style="width:100%;" required min="0" placeholder="3500">
+          </div>
+          <div>
+            <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Stock</label>
+            <input type="number" id="f-stock" class="admin-search-input" style="width:100%;" min="0" value="0">
+          </div>
+        </div>
+
+        <div style="margin-bottom:var(--space-md);">
+          <label style="display:block;font-size:var(--font-size-sm);font-weight:var(--font-weight-medium);margin-bottom:var(--space-sm);">Image de couverture</label>
+          <div class="image-upload-zone" id="upload-zone" onclick="document.getElementById('f-image').click()">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" style="margin:0 auto var(--space-sm)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">Cliquez pour choisir une image (JPG, PNG, WebP — max 5 Mo)</p>
+            <input type="file" id="f-image" accept="image/*" style="display:none;">
+          </div>
+          <div class="image-upload-preview" id="img-preview">
+            <img id="img-preview-src" src="" alt="Aperçu">
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:var(--space-xl);margin-bottom:var(--space-xl);">
+          <label style="display:flex;align-items:center;gap:var(--space-sm);font-size:var(--font-size-sm);cursor:pointer;">
+            <input type="checkbox" id="f-featured" style="accent-color:var(--color-primary);width:16px;height:16px;">
+            Mettre en avant (featured)
+          </label>
+          <label style="display:flex;align-items:center;gap:var(--space-sm);font-size:var(--font-size-sm);cursor:pointer;">
+            <input type="checkbox" id="f-hero" style="accent-color:var(--color-primary);width:16px;height:16px;">
+            Mis en avant Hero (page d'accueil)
+          </label>
+        </div>
+
+        <div id="form-error" style="display:none;background:#FFEBEE;color:var(--color-error);padding:var(--space-md);border-radius:var(--radius-md);font-size:var(--font-size-sm);margin-bottom:var(--space-md);"></div>
+
+        <div style="display:flex;gap:var(--space-md);justify-content:flex-end;">
+          <button type="button" class="btn-admin-secondary" id="modal-cancel">Annuler</button>
+          <button type="submit" class="btn-admin-primary" id="form-submit-btn">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal" style="max-width:400px;text-align:center;">
+      <p style="font-size:var(--font-size-md);margin-bottom:var(--space-xl);">Voulez-vous vraiment supprimer ce livre ?</p>
+      <div style="display:flex;gap:var(--space-md);justify-content:center;">
+        <button class="btn-admin-secondary" id="confirm-cancel">Annuler</button>
+        <button class="btn-admin-danger" id="confirm-delete">Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="admin-toast"></div>
+
+  <script src="../js/admin.js"></script>
+  <script>
+    let booksData = [];
+    let editingId = null;
+    let deletingId = null;
+    let currentPage = 1;
+
+    async function loadBooks(page = 1) {
+      const q = document.getElementById('search-books').value;
+      const category = document.getElementById('filter-category').value;
+      const query = new URLSearchParams({ q, category, page, limit: 15 }).toString();
+
+      try {
+        const res = await fetch(`/api/books?${query}`);
+        const data = await res.json();
+        booksData = data.books || data;
+        const total = data.total || booksData.length;
+        document.getElementById('books-count').textContent = total;
+        renderBooks(booksData);
+        renderPagination(Math.ceil(total / 15), page);
+      } catch {
+        document.getElementById('books-tbody').innerHTML = `<tr><td colspan="8" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Erreur de chargement</td></tr>`;
+      }
+    }
+
+    function renderBooks(books) {
+      const tbody = document.getElementById('books-tbody');
+      if (!books.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Aucun livre</td></tr>';
+        return;
+      }
+      tbody.innerHTML = books.map(b => `
+        <tr>
+          <td>
+            <img class="table-book-cover" src="${b.image ? '/uploads/' + b.image : 'https://via.placeholder.com/40x56/E8F5E9/2E7D32?text=📚'}" alt="${b.title}" onerror="this.src='https://via.placeholder.com/40x56/E8F5E9/2E7D32?text=📚'">
+          </td>
+          <td><strong>${b.title}</strong></td>
+          <td>${b.author}</td>
+          <td><span class="status-badge" style="background:var(--color-primary-bg);color:var(--color-primary-dark);">${b.category}</span></td>
+          <td style="text-decoration:line-through;color:var(--color-text-secondary);">${b.originalPrice?.toLocaleString('fr-FR')} FCFA</td>
+          <td style="color:var(--color-primary);font-weight:bold;">${b.promoPrice?.toLocaleString('fr-FR')} FCFA</td>
+          <td>${b.stock}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-icon edit" onclick="openEdit('${b._id}')" title="Modifier">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn-icon delete" onclick="openDelete('${b._id}')" title="Supprimer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    function renderPagination(total, current) {
+      const el = document.getElementById('books-pagination');
+      if (total <= 1) { el.innerHTML = ''; return; }
+      let html = '';
+      for (let i = 1; i <= total; i++) {
+        html += `<button class="page-btn${i === current ? ' active' : ''}" onclick="currentPage=${i};loadBooks(${i})">${i}</button>`;
+      }
+      el.innerHTML = html;
+    }
+
+    function openAdd() {
+      editingId = null;
+      document.getElementById('modal-title').textContent = 'Ajouter un livre';
+      document.getElementById('book-form').reset();
+      document.getElementById('book-id').value = '';
+      document.getElementById('img-preview').style.display = 'none';
+      document.getElementById('form-error').style.display = 'none';
+      document.getElementById('book-modal').classList.add('open');
+    }
+
+    function openEdit(id) {
+      const book = booksData.find(b => b._id === id);
+      if (!book) return;
+      editingId = id;
+      document.getElementById('modal-title').textContent = 'Modifier le livre';
+      document.getElementById('book-id').value = id;
+      document.getElementById('f-title').value = book.title;
+      document.getElementById('f-author').value = book.author;
+      document.getElementById('f-description').value = book.description || '';
+      const formSel = document.getElementById('f-category');
+      if (formSel) formSel.value = book.category;
+      document.getElementById('f-genre').value = book.genre || '';
+      document.getElementById('f-orig-price').value = book.originalPrice;
+      document.getElementById('f-promo-price').value = book.promoPrice;
+      document.getElementById('f-stock').value = book.stock;
+      document.getElementById('f-featured').checked = book.featured;
+      document.getElementById('f-hero').checked = book.heroFeatured || false;
+      document.getElementById('form-error').style.display = 'none';
+
+      if (book.image) {
+        const preview = document.getElementById('img-preview');
+        document.getElementById('img-preview-src').src = '/uploads/' + book.image;
+        preview.style.display = 'block';
+      } else {
+        document.getElementById('img-preview').style.display = 'none';
+      }
+
+      document.getElementById('book-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('book-modal').classList.remove('open');
+    }
+
+    function openDelete(id) {
+      deletingId = id;
+      document.getElementById('confirm-modal').classList.add('open');
+    }
+
+    async function saveBook(e) {
+      e.preventDefault();
+      const btn = document.getElementById('form-submit-btn');
+      const errorEl = document.getElementById('form-error');
+      errorEl.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Enregistrement...';
+
+      const formData = new FormData();
+      formData.append('title', document.getElementById('f-title').value);
+      formData.append('author', document.getElementById('f-author').value);
+      formData.append('description', document.getElementById('f-description').value);
+      formData.append('category', document.getElementById('f-category').value);
+      formData.append('genre', document.getElementById('f-genre').value);
+      formData.append('originalPrice', document.getElementById('f-orig-price').value);
+      formData.append('promoPrice', document.getElementById('f-promo-price').value);
+      formData.append('stock', document.getElementById('f-stock').value);
+      formData.append('featured', document.getElementById('f-featured').checked);
+      formData.append('heroFeatured', document.getElementById('f-hero').checked);
+      const imageFile = document.getElementById('f-image').files[0];
+      if (imageFile) formData.append('image', imageFile);
+
+      try {
+        const url = editingId ? `/api/books/${editingId}` : '/api/books';
+        const method = editingId ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, body: formData });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Erreur');
+        AdminUtils.showAdminToast(editingId ? 'Livre modifié !' : 'Livre ajouté !', 'success');
+        closeModal();
+        loadBooks(currentPage);
+      } catch (err) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enregistrer';
+      }
+    }
+
+    async function deleteBook() {
+      if (!deletingId) return;
+      try {
+        const res = await fetch(`/api/books/${deletingId}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Erreur lors de la suppression');
+        AdminUtils.showAdminToast('Livre supprimé', '');
+        document.getElementById('confirm-modal').classList.remove('open');
+        loadBooks(currentPage);
+      } catch (err) {
+        AdminUtils.showAdminToast(err.message, 'error');
+      }
+    }
+
+    // Image preview
+
+    async function loadCategorySelects(selectedValue) {
+      const defaultCats = ['Romans', 'Sciences humaines', 'Développement personnel', 'Jeunesse', 'Histoire', 'Biographies', 'Science-fiction', 'Policier', 'Autre'];
+      let names = defaultCats;
+      try {
+        const res = await fetch('/api/categories');
+        if (res.ok) {
+          const cats = await res.json();
+          if (cats.length) names = cats.map(c => c.name);
+        }
+      } catch {}
+
+      const filterSel = document.getElementById('filter-category');
+      const formSel = document.getElementById('f-category');
+
+      const filterOpts = '<option value="">Toutes les catégories</option>' +
+        names.map(n => '<option value="' + n + '"' + (selectedValue === n ? ' selected' : '') + '>' + n + '</option>').join('');
+      const formOpts = '<option value="">Sélectionner...</option>' +
+        names.map(n => '<option>' + n + '</option>').join('');
+
+      if (filterSel) filterSel.innerHTML = filterOpts;
+      if (formSel) formSel.innerHTML = formOpts;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      AdminUtils.initAdminSidebar();
+      await AdminUtils.requireAdminAuth();
+      await loadCategorySelects();
+      loadBooks();
+
+      document.getElementById('btn-add-book').addEventListener('click', openAdd);
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+      document.getElementById('modal-cancel').addEventListener('click', closeModal);
+      document.getElementById('book-form').addEventListener('submit', saveBook);
+      document.getElementById('btn-search-books').addEventListener('click', () => loadBooks(1));
+      document.getElementById('search-books').addEventListener('keydown', e => { if (e.key === 'Enter') loadBooks(1); });
+      document.getElementById('confirm-cancel').addEventListener('click', () => document.getElementById('confirm-modal').classList.remove('open'));
+      document.getElementById('confirm-delete').addEventListener('click', deleteBook);
+
+      document.getElementById('f-image').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          document.getElementById('img-preview-src').src = ev.target.result;
+          document.getElementById('img-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+  </script>
+</body>
+</html>

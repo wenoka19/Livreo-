@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livreo — Ta librairie en ligne, livraison à domicile</title>
+  <meta name="description" content="Livreo, votre librairie en ligne avec livraison à domicile et paiement à la réception (COD). Romans, sciences humaines, développement personnel et plus.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Header + Nav injected by JS -->
+  <div id="header-placeholder"></div>
+
+  <main>
+
+    <!-- ===== HERO BANNER ===== -->
+    <section class="hero-banner">
+      <div class="container">
+        <div class="hero-content">
+          <span class="hero-tagline">Nouveauté 2024</span>
+          <h1 class="hero-title">
+            Les meilleurs livres,<br>
+            <span>livrés chez vous</span>
+          </h1>
+          <p class="hero-description">
+            Parcourez notre catalogue de milliers de livres. Commandez en ligne et payez à la livraison — aucun compte requis.
+          </p>
+          <div class="hero-cta">
+            <a href="catalogue.html" class="btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 21-4.35-4.35"/><circle cx="11" cy="11" r="8"/></svg>
+              Parcourir le catalogue
+            </a>
+          </div>
+        </div>
+        <div class="hero-image" id="hero-books">
+          <!-- Hero featured books injected by JS -->
+          <div class="hero-book-placeholder" style="background:var(--color-primary-bg);border-radius:8px;aspect-ratio:2/3;animation:pulse 1.5s infinite;"></div>
+          <div class="hero-book-placeholder" style="background:#C8E6C9;border-radius:8px;aspect-ratio:2/3;margin-top:30px;animation:pulse 1.5s infinite;"></div>
+          <div class="hero-book-placeholder" style="background:#A5D6A7;border-radius:8px;aspect-ratio:2/3;animation:pulse 1.5s infinite;"></div>
+          <div class="hero-book-placeholder" style="background:#81C784;border-radius:8px;aspect-ratio:2/3;margin-top:30px;animation:pulse 1.5s infinite;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DERNIÈRES PARUTIONS ===== -->
+    <section class="book-section" id="dernieres-parutions">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" id="title-new-releases">Dernières parutions</h2>
+          <a href="catalogue.html?sort=newest" class="section-link">
+            Voir tout
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+        <div class="book-row" id="row-new-releases">
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MEILLEURS LIVRES DU MOMENT ===== -->
+    <section class="book-section" style="background:var(--color-surface);padding:var(--space-2xl) 0;" id="best-books">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" id="title-bestsellers">Les meilleurs livres du moment</h2>
+          <a href="catalogue.html?sort=popular" class="section-link">
+            Voir tout
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+        <div class="book-row" id="row-bestsellers">
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-border);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-border);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-border);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-border);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-border);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-border);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== NOUVEAUX LIVRES ===== -->
+    <section class="book-section" id="nouveaux-livres">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" id="title-new">Nouveaux livres</h2>
+          <a href="catalogue.html" class="section-link">
+            Voir tout
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+        <div class="book-row" id="row-new">
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+          <div class="book-skeleton" style="flex:0 0 200px;background:var(--color-surface);border-radius:12px;height:320px;animation:pulse 1.5s infinite;"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===== CATEGORY SECTIONS ===== -->
+    <section class="category-section" id="cat-romans">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" id="title-cat1">Romans</h2>
+          <a href="catalogue.html?cat=Romans" class="section-link">
+            Voir tout
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+        <div class="books-grid" id="grid-romans">
+          <div style="grid-column:1/-1;color:var(--color-text-secondary);font-size:var(--font-size-sm);">Chargement des livres...</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category-section" id="cat-dev-perso">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title" id="title-cat2">Développement personnel</h2>
+          <a href="catalogue.html?cat=D%C3%A9veloppement+personnel" class="section-link">
+            Voir tout
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+        <div class="books-grid" id="grid-devperso">
+          <div style="grid-column:1/-1;color:var(--color-text-secondary);font-size:var(--font-size-sm);">Chargement des livres...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TRUSTPILOT REVIEWS ===== -->
+    <section class="reviews-section">
+      <div class="container">
+        <div class="section-header" style="justify-content:center;flex-direction:column;text-align:center;gap:var(--space-md);">
+          <h2 class="section-title" style="text-align:center;">Ce que disent nos clients</h2>
+          <div class="trustpilot-badge">
+            <span class="trustpilot-score">4.8</span>
+            <div>
+              <div class="review-stars" style="justify-content:flex-start;">
+                <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+              </div>
+              <p class="trustpilot-label">Basé sur 248 avis clients</p>
+            </div>
+          </div>
+        </div>
+        <div class="reviews-grid">
+          <div class="review-card">
+            <div class="review-stars">
+              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+            </div>
+            <p class="review-text">"Excellente expérience ! Le livre est arrivé en parfait état, bien emballé. Le paiement à la livraison est vraiment pratique. Je recommande vivement Livreo !"</p>
+            <div class="review-author">Aminata K.</div>
+            <div class="review-date">Il y a 3 jours</div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">
+              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+            </div>
+            <p class="review-text">"Livraison rapide, prix compétitifs et très bonne sélection de livres. C'est devenu ma librairie en ligne préférée. Le service client via WhatsApp est top !"</p>
+            <div class="review-author">Kofi M.</div>
+            <div class="review-date">Il y a 1 semaine</div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">
+              <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+            </div>
+            <p class="review-text">"J'adore le concept. Pas besoin de créer un compte, on commande facilement et on paye à la réception. Les livres sont en excellent état. Merci Livreo !"</p>
+            <div class="review-author">Fatoumata D.</div>
+            <div class="review-date">Il y a 2 semaines</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ SECTION ===== -->
+    <section class="faq-section" id="faq">
+      <div class="container">
+        <div class="section-header" style="justify-content:center;">
+          <h2 class="section-title" style="text-align:center;">Questions fréquentes</h2>
+        </div>
+        <ul class="faq-list">
+          <li class="faq-item">
+            <button class="faq-question">
+              Comment commander / passer ma commande ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Choisissez vos livres dans notre catalogue. Cliquez sur le bouton Commander pour sélectionner les livres que vous voulez commander et lorsque vous avez fini votre achat, cliquez sur Finalisez ma commande et remplissez le formulaire puis cliquez Confirmer ma commande.
+            </div>
+          </li>
+          <li class="faq-item">
+            <button class="faq-question">
+              Vos livres sont des livres physiques ou des PDF en ligne ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Nos livres sont physiques, en papier uniquement.
+            </div>
+          </li>
+                    <li class="faq-item">
+            <button class="faq-question">
+              Comment fonctionne la livraison ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Nous livrons à domicile dans un délai de 24 à 72 heures selon votre localisation. Dès que votre commande est confirmée, notre équipe prépare votre colis et vous contacte pour planifier la livraison.
+            </div>
+          </li>
+          <li class="faq-item">
+            <button class="faq-question">
+              Comment se passe le paiement ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Livreo fonctionne exclusivement en paiement à la livraison (Cash on Delivery). Vous payez en espèces au moment où vous recevez vos livres. Aucun paiement en ligne n'est requis.
+            </div>
+          </li>
+          <li class="faq-item">
+            <button class="faq-question">
+              Dois-je créer un compte pour commander ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Non, aucun compte n'est nécessaire. Il vous suffit de renseigner votre nom, numéro de téléphone et adresse de livraison lors de la commande. C'est aussi simple que ça !
+            </div>
+          </li>
+          <li class="faq-item">
+            <button class="faq-question">
+              Puis-je retourner un livre ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Oui, si votre livre est endommagé ou ne correspond pas à votre commande, contactez-nous via WhatsApp dans les 48h suivant la réception. Nous arrangerons un échange ou un remboursement.
+            </div>
+          </li>
+          <li class="faq-item">
+            <button class="faq-question">
+              Quelles sont les zones de livraison ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Nous livrons actuellement dans les principales villes. Contactez-nous sur WhatsApp pour vérifier si votre ville est couverte. Nous élargissons régulièrement nos zones de livraison.
+            </div>
+          </li>
+          <li class="faq-item">
+            <button class="faq-question">
+              Comment suivre ma commande ?
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-answer">
+              Après votre commande, vous recevez un numéro de suivi. Notre équipe vous contactera par téléphone pour confirmer la livraison. Vous pouvez aussi nous joindre sur WhatsApp avec votre numéro de commande.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== NEWSLETTER ===== -->
+    <section class="newsletter-section" id="newsletter">
+      <div class="container">
+        <h2 class="newsletter-title">Restez informé de nos nouveautés</h2>
+        <p class="newsletter-subtitle">Recevez nos sélections et promotions directement dans votre boîte mail</p>
+        <form class="newsletter-form" id="newsletter-form">
+          <input type="email" class="newsletter-input" placeholder="Votre adresse email" required>
+          <button type="submit" class="newsletter-btn">S'abonner</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer injected by JS -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Keyframe for loading skeleton -->
+  <style>
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+
+  <script src="js/components.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
