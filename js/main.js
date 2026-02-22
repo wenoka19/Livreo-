@@ -169,16 +169,7 @@ async function loadHeroBooks() {
       : 'https://via.placeholder.com/200x300/E8F5E9/2E7D32?text=📚';
     const price = (book.promoPrice || book.price || 0).toLocaleString('fr-FR');
     const id = book._id || book.id;
-    return '<div class="hero-book-card" style="margin-top:' + margins[i] + '">' +
-      '<a href="livre.html?id=' + id + '">' +
-      '<img src="' + imgSrc + '" alt="' + escapeAttr(book.title) + '" onerror="this.src='https://via.placeholder.com/200x300/E8F5E9/2E7D32?text=📚'">' +
-      '</a>' +
-      '<div class="hero-book-card-overlay">' +
-      '<p class="hero-book-card-title">' + book.title + '</p>' +
-      '<p class="hero-book-card-price">' + price + ' FCFA</p>' +
-      '<button class="hero-book-card-btn" onclick="handleAddToCart('' + id + '','' + escapeAttr(book.title) + '','' + escapeAttr(book.author) + '',' + (book.promoPrice || book.price || 0) + ','' + imgSrc + '')">Commander</button>' +
-      '</div>' +
-      '</div>';
+    return `<div class="hero-book-card" style="margin-top:${margins[i]}"><a href="livre.html?id=${id}"><img src="${imgSrc}" alt="${escapeAttr(book.title)}" onerror="this.src='https://via.placeholder.com/200x300/E8F5E9/2E7D32?text=📚'"></a><div class="hero-book-card-overlay"><p class="hero-book-card-title">${book.title}</p><p class="hero-book-card-price">${price} FCFA</p><button class="hero-book-card-btn" onclick="handleAddToCart('${id}','${escapeAttr(book.title)}','${escapeAttr(book.author)}',${book.promoPrice || book.price || 0},'${imgSrc}')">Commander</button></div></div>`;
   }).join('');
 }
 
