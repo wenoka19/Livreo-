@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demandes de livres — Livreo Admin</title>
+  <link rel="stylesheet" href="../css/variables.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <aside class="admin-sidebar" id="admin-sidebar"></aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <h1 class="admin-topbar-title">Demandes de livres</h1>
+      <div class="admin-topbar-right">
+        <div class="admin-user-badge">
+          <div class="admin-user-avatar">A</div>
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- Filters + count -->
+      <div class="admin-card" style="margin-bottom:var(--space-lg);">
+        <div class="admin-card-header" style="flex-wrap:wrap;gap:var(--space-sm);">
+          <p id="req-count" style="font-size:var(--font-size-sm);color:var(--color-text-secondary);">Chargement…</p>
+          <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+            <button class="btn-admin-secondary filter-btn active" data-status="">Toutes</button>
+            <button class="btn-admin-secondary filter-btn" data-status="En attente">En attente</button>
+            <button class="btn-admin-secondary filter-btn" data-status="Contacté">Contacté</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="admin-card">
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Titre recherché</th>
+                <th>WhatsApp</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="requests-tbody">
+              <tr>
+                <td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">
+                  Chargement…
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast" id="admin-toast"></div>
+
+  <script src="../js/admin.js"></script>
+  <script>
+    let currentFilter = '';
+
+    async function loadRequests() {
+      const tbody = document.getElementById('requests-tbody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Chargement…</td></tr>';
+
+      try {
+        const url = '/api/book-requests' + (currentFilter ? '?status=' + encodeURIComponent(currentFilter) : '');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Erreur API');
+        const data = await res.json();
+        const requests = data.requests || [];
+        const total = data.total || requests.length;
+
+        document.getElementById('req-count').textContent =
+          total + ' demande' + (total !== 1 ? 's' : '');
+
+        if (!requests.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Aucune demande.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = requests.map((r, i) => `
+          <tr data-id="${r._id}">
+            <td style="color:var(--color-text-secondary);font-size:var(--font-size-xs);">${i + 1}</td>
+            <td><strong>${escapeHtml(r.bookTitle)}</strong></td>
+            <td>
+              <a href="https://wa.me/${r.whatsappNumber}" target="_blank" rel="noopener"
+                style="color:var(--color-primary);font-weight:var(--font-weight-medium);text-decoration:underline;">
+                ${escapeHtml(r.whatsappNumber)}
+              </a>
+            </td>
+            <td style="font-size:var(--font-size-xs);color:var(--color-text-secondary);">${AdminUtils.formatDate(r.createdAt)}</td>
+            <td>${statusBadge(r.status)}</td>
+            <td>
+              ${r.status === 'En attente'
+                ? `<button class="btn-icon edit" title="Marquer comme contacté"
+                     onclick="markContacted('${r._id}', this)">
+                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                       <polyline points="20 6 9 17 4 12"/>
+                     </svg>
+                   </button>`
+                : '<span style="color:var(--color-text-secondary);font-size:var(--font-size-xs);">—</span>'
+              }
+            </td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-error);">Erreur de chargement</td></tr>';
+      }
+    }
+
+    function statusBadge(status) {
+      const map = { 'En attente': 'status-pending', 'Contacté': 'status-confirmed' };
+      return `<span class="status-badge ${map[status] || ''}">${status}</span>`;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    async function markContacted(id, btn) {
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/book-requests/' + id + '/status', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'Contacté' }),
+        });
+        if (!res.ok) throw new Error();
+        AdminUtils.showAdminToast('Demande marquée comme contactée', 'success');
+        loadRequests();
+      } catch {
+        AdminUtils.showAdminToast('Erreur lors de la mise à jour', 'error');
+        btn.disabled = false;
+      }
+    }
+
+    // Filter buttons
+    document.addEventListener('DOMContentLoaded', async () => {
+      AdminUtils.initAdminSidebar();
+      await AdminUtils.requireAdminAuth();
+
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.status;
+          loadRequests();
+        });
+      });
+
+      loadRequests();
+    });
+  </script>
+
+  <style>
+    .filter-btn.active {
+      background: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+  </style>
+</body>
+</html>

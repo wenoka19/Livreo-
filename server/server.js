@@ -53,12 +53,14 @@ const ordersRouter = require('./routes/orders');
 const adminRouter = require('./routes/admin');
 const categoriesRouter = require('./routes/categories');
 const settingsRouter = require('./routes/settings');
+const bookRequestsRouter = require('./routes/book-requests');
 
 app.use('/api/books', booksRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/book-requests', bookRequestsRouter);
 
 // ===== HEALTH CHECK =====
 app.get('/api/health', (req, res) => {
