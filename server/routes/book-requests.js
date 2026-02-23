@@ -5,11 +5,13 @@ const BookRequest = require('../models/BookRequest');
 // POST /api/book-requests — public (called by exit intent popup)
 router.post('/', async (req, res) => {
   try {
-    const { bookTitle, whatsappNumber } = req.body;
-    if (!bookTitle || !whatsappNumber) {
-      return res.status(400).json({ message: 'Titre du livre et numéro WhatsApp requis' });
+    const { bookTitle, whatsappNumber, source } = req.body;
+    if (!bookTitle) {
+      return res.status(400).json({ message: 'Titre du livre requis' });
     }
-    const request = new BookRequest({ bookTitle: bookTitle.trim(), whatsappNumber: whatsappNumber.trim() });
+    const data = { bookTitle: bookTitle.trim(), whatsappNumber: (whatsappNumber || '').trim() };
+    if (source === 'barre de recherche') data.source = 'barre de recherche';
+    const request = new BookRequest(data);
     await request.save();
     res.status(201).json(request);
   } catch (err) {

@@ -1,0 +1,101 @@
+N°;Titre;Auteur;Catégorie;Prix suggéré (FCFA);Description courte
+1;Un long chemin vers la liberté;Nelson Mandela;Biographie;5000;Autobiographie du héros de la lutte anti-apartheid
+2;Amkoullel, l'enfant peul;Amadou Hampâté Bâ;Biographie;5500;Mémoires du grand sage malien, son enfance en Afrique
+3;Oui Chef !;Amadou Hampâté Bâ;Biographie;5000;Suite des mémoires, sa vie d'administrateur colonial
+4;Ma part de vérité;Alassane Ouattara;Biographie;4500;Le parcours du président ivoirien
+5;Mémoires d'un étudiant africain (Vol.1);Laye Camara;Biographie;4000;Autobiographie de l'auteur de L'Enfant noir
+6;Une terre promise;Barack Obama;Biographie;7000;Mémoires du 44e président des États-Unis
+7;Devenir;Michelle Obama;Biographie;6500;Autobiographie inspirante de l'ex-première dame
+8;L'Audace d'espérer;Barack Obama;Biographie;5500;Réflexions sur la politique et la vie
+9;Autobiographie de Malcolm X;Malcolm X / Alex Haley;Biographie;5000;Parcours du leader afro-américain
+10;Steve Jobs;Walter Isaacson;Biographie;6000;Biographie du fondateur d'Apple
+11;Elon Musk;Walter Isaacson;Biographie;7000;Biographie du fondateur de Tesla et SpaceX
+12;Je suis Malala;Malala Yousafzai;Biographie;4500;Combat d'une jeune fille pour l'éducation
+13;Thomas Sankara, l'insurgé;Bruno Jaffré;Biographie;5000;Biographie du père de la révolution burkinabè
+14;Kwame Nkrumah - Le panafricanisme;Collectif;Biographie;4500;Vie du père de l'indépendance du Ghana
+15;Les Contes d'Amadou Koumba;Birago Diop;Contes et légendes africaines;2500;Les plus beaux contes traditionnels sénégalais
+16;Soundjata ou l'épopée mandingue;Djibril Tamsir Niane;Contes et légendes africaines;2500;L'épopée du fondateur de l'Empire du Mali
+17;Leuk-le-Lièvre;Léopold Sédar Senghor;Contes et légendes africaines;2500;Contes animaliers d'Afrique de l'Ouest
+18;Contes et légendes d'Afrique de l'Ouest;Collectif;Contes et légendes africaines;3000;Recueil des plus belles histoires traditionnelles
+19;La Belle Histoire de Leuk-le-Lièvre;Abdoulaye Sadji;Contes et légendes africaines;2500;Aventures du célèbre lièvre malin
+20;Contes de la savane;Amadou Hampâté Bâ;Contes et légendes africaines;3500;Contes peuls et maliens
+21;Il n'y a pas de petite querelle;Amadou Hampâté Bâ;Contes et légendes africaines;3000;Contes initiatiques d'Afrique
+22;Contes et mythes du Togo;Collectif;Contes et légendes africaines;3000;Récits traditionnels togolais
+23;Le Pagne noir;Bernard Dadié;Contes et légendes africaines;2500;Contes africains de Côte d'Ivoire
+24;Les Nouveaux Contes d'Amadou Koumba;Birago Diop;Contes et légendes africaines;2500;Suite des contes traditionnels sénégalais
+25;Kaïdara;Amadou Hampâté Bâ;Contes et légendes africaines;3500;Récit initiatique peul
+26;Contes d'Afrique pour les tout-petits;Souleymane Mbodj;Contes et légendes africaines;3000;5 contes pour les jeunes enfants
+27;L'Os de Mor Lam;Birago Diop;Contes et légendes africaines;2500;Conte satirique sénégalais
+28;Petit Bodiel et autres contes;Amadou Hampâté Bâ;Contes et légendes africaines;3000;Contes de la tradition peule
+29;Père riche, père pauvre;Robert Kiyosaki;Développement personnel;5000;Le guide de l'éducation financière
+30;Les 48 lois du pouvoir;Robert Greene;Développement personnel;6000;Stratégies de pouvoir et d'influence
+31;Réfléchissez et devenez riche;Napoleon Hill;Développement personnel;4500;Les principes du succès financier
+32;Un rien peut tout changer;James Clear;Développement personnel;5500;Comment créer de bonnes habitudes
+33;L'Alchimiste;Paulo Coelho;Développement personnel;4000;Quête spirituelle et destinée personnelle
+34;Les 7 habitudes de ceux qui réalisent tout;Stephen Covey;Développement personnel;5500;Les clés de l'efficacité personnelle
+35;Comment se faire des amis;Dale Carnegie;Développement personnel;4500;L'art des relations humaines
+36;Le Pouvoir du moment présent;Eckhart Tolle;Développement personnel;4500;Vivre dans l'instant présent
+37;L'Art de la guerre;Sun Tzu;Développement personnel;3000;Stratégie militaire applicable à la vie
+38;La Magie de voir grand;David Schwartz;Développement personnel;4500;Croire en soi pour réussir
+39;Les Lois de la nature humaine;Robert Greene;Développement personnel;7000;Comprendre le comportement humain
+40;L'Homme le plus riche de Babylone;George S. Clason;Développement personnel;3500;Paraboles sur la richesse
+41;Les Secrets d'un esprit millionnaire;T. Harv Eker;Développement personnel;5000;Changer sa mentalité financière
+42;Influence et manipulation;Robert Cialdini;Développement personnel;5500;Psychologie de la persuasion
+43;La Semaine de 4 heures;Tim Ferriss;Développement personnel;5000;Travailler moins, vivre plus
+44;Aya de Yopougon (Tome 1);Marguerite Abouet;Jeunesse et Bandes Dessinées;4500;BD culte sur la vie à Abidjan
+45;Aya de Yopougon (Tome 2);Marguerite Abouet;Jeunesse et Bandes Dessinées;4500;Suite des aventures d'Aya
+46;Akissi (Tome 1) - Attaque de chats;Marguerite Abouet;Jeunesse et Bandes Dessinées;3500;BD humoristique pour enfants en Afrique
+47;Le Petit Prince;Antoine de Saint-Exupéry;Jeunesse et Bandes Dessinées;2500;Conte philosophique universel
+48;Harry Potter à l'école des sorciers;J.K. Rowling;Jeunesse et Bandes Dessinées;5000;L'aventure magique la plus lue au monde
+49;Harry Potter et la chambre des secrets;J.K. Rowling;Jeunesse et Bandes Dessinées;5000;Suite des aventures de Harry
+50;Tintin au Congo;Hergé;Jeunesse et Bandes Dessinées;4000;BD classique en Afrique
+51;Astérix et Cléopâtre;Goscinny / Uderzo;Jeunesse et Bandes Dessinées;4000;BD classique en Égypte
+52;L'Enfant noir (édition jeunesse);Camara Laye;Jeunesse et Bandes Dessinées;2500;Version jeunesse du classique
+53;Petit Jo enfant des rues;Evelyne Mpoudi Ngollé;Jeunesse et Bandes Dessinées;3000;Roman jeunesse camerounais
+54;Le Ballon d'or;Yves Pinguilly;Jeunesse et Bandes Dessinées;3000;Roman jeunesse sur le football en Afrique
+55;Bescherelle - La conjugaison;Collectif;Jeunesse et Bandes Dessinées;5000;Outil indispensable pour les élèves
+56;Dictionnaire Larousse;Collectif;Jeunesse et Bandes Dessinées;8000;Référence pour toute la famille
+57;Contes et fables d'Afrique (illustré);Collectif;Jeunesse et Bandes Dessinées;3500;Contes illustrés pour enfants
+58;L'Enfant noir;Camara Laye;Romans;3000;Autobiographie poétique en Guinée
+59;Le Monde s'effondre;Chinua Achebe;Romans;3500;L'Afrique face à la colonisation
+60;Une si longue lettre;Mariama Bâ;Romans;2500;Condition de la femme au Sénégal
+61;L'Aventure ambiguë;Cheikh Hamidou Kane;Romans;3000;Déchirement entre tradition et modernité
+62;Les Soleils des indépendances;Ahmadou Kourouma;Romans;3500;Désillusion post-indépendance
+63;Allah n'est pas obligé;Ahmadou Kourouma;Romans;3500;Récit d'un enfant-soldat
+64;Sous l'orage;Seydou Badian;Romans;2500;Conflit de générations au Mali
+65;Le Vieux Nègre et la médaille;Ferdinand Oyono;Romans;2500;Satire du colonialisme
+66;Ville cruelle;Eza Boto (Mongo Beti);Romans;3000;La dureté de la vie urbaine coloniale
+67;Verre Cassé;Alain Mabanckou;Romans;3500;Humour et récits dans un bar congolais
+68;Americanah;Chimamanda Ngozi Adichie;Romans;5000;Immigration et identité entre Afrique et USA
+69;L'Hibiscus pourpre;Chimamanda Ngozi Adichie;Romans;4000;Famille et liberté au Nigeria
+70;La plus secrète mémoire des hommes;Mohamed Mbougar Sarr;Romans;5500;Prix Goncourt 2021, mystère littéraire
+71;Petit Pays;Gaël Faye;Romans;4000;Enfance au Burundi avant le génocide
+72;Le Ventre de l'Atlantique;Fatou Diome;Romans;3500;Rêve d'Europe depuis le Sénégal
+73;La Bible (Louis Segond);Collectif;Religion et Spiritualité;5000;Traduction française la plus répandue
+74;Le Coran (traduction française);Collectif;Religion et Spiritualité;5000;Livre saint de l'Islam
+75;La Citadelle du musulman;Sa'id Al-Qahtani;Religion et Spiritualité;2000;Invocations et prières quotidiennes
+76;Riyad as-Salihin (Les Jardins des vertueux);Imam An-Nawawi;Religion et Spiritualité;5000;Recueil de hadiths essentiels
+77;Les 40 hadiths de l'Imam An-Nawawi;Imam An-Nawawi;Religion et Spiritualité;2500;Hadiths fondamentaux de l'Islam
+78;La Puissance de la prière;Stormie Omartian;Religion et Spiritualité;4000;Guide de prière pour femmes
+79;Un homme selon le cur de Dieu;Jim George;Religion et Spiritualité;4000;Guide spirituel pour hommes
+80;Une femme selon le cur de Dieu;Elizabeth George;Religion et Spiritualité;4000;Guide spirituel pour femmes
+81;La Prière qui renverse les montagnes;John Eckhardt;Religion et Spiritualité;4500;Prières de combat spirituel
+82;Le Combat spirituel;Lorenzo Scupoli;Religion et Spiritualité;3500;Guide de vie spirituelle
+83;Nouveau Testament;Collectif;Religion et Spiritualité;2000;Les Évangiles et Épîtres
+84;Les Psaumes et Proverbes;Collectif;Religion et Spiritualité;2500;Sagesse biblique
+85;La Force de la foi;Reinhard Bonnke;Religion et Spiritualité;4000;Évangéliste populaire en Afrique
+86;Chapitre Amma (Juz' Amma);Collectif;Religion et Spiritualité;1500;Dernière partie du Coran, très apprise
+87;Nations nègres et culture;Cheikh Anta Diop;Sciences humaines & Histoire africaine;6000;Origines africaines de la civilisation égyptienne
+88;L'Afrique noire précoloniale;Cheikh Anta Diop;Sciences humaines & Histoire africaine;5500;Organisation politique et sociale de l'Afrique ancienne
+89;Antériorité des civilisations nègres;Cheikh Anta Diop;Sciences humaines & Histoire africaine;5500;Mythe ou vérité historique
+90;Peau noire, masques blancs;Frantz Fanon;Sciences humaines & Histoire africaine;4000;Psychologie du colonisé
+91;Les Damnés de la terre;Frantz Fanon;Sciences humaines & Histoire africaine;4500;Analyse de la décolonisation
+92;Discours sur le colonialisme;Aimé Césaire;Sciences humaines & Histoire africaine;3000;Réquisitoire contre le colonialisme
+93;Le Génocide voilé;Tidiane N'Diaye;Sciences humaines & Histoire africaine;5000;La traite arabo-musulmane en Afrique
+94;Sapiens - Une brève histoire de l'humanité;Yuval Noah Harari;Sciences humaines & Histoire africaine;7000;L'histoire de l'humanité depuis 100 000 ans
+95;Cahier d'un retour au pays natal;Aimé Césaire;Sciences humaines & Histoire africaine;3000;Poème fondateur de la négritude
+96;L'uvre poétique (anthologie);Léopold Sédar Senghor;Sciences humaines & Histoire africaine;5000;Poésie du premier président du Sénégal
+97;Nous devrions tous être féministes;Chimamanda Ngozi Adichie;Sciences humaines & Histoire africaine;2500;Essai sur le féminisme en Afrique
+98;Philosophie africaine;Paulin Hountondji;Sciences humaines & Histoire africaine;5500;Réflexions sur la pensée africaine
+99;Et si l'Afrique refusait le développement ?;Axelle Kabou;Sciences humaines & Histoire africaine;4500;Analyse critique du développement en Afrique
+100;L'Afrique peut-elle s'en sortir ?;Axelle Kabou;Sciences humaines & Histoire africaine;4500;Suite de la réflexion sur l'avenir du continent

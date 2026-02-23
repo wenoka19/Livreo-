@@ -69,6 +69,7 @@ function renderHeader() {
             </svg>
           </button>
         </form>
+        <div class="search-dropdown" id="search-dropdown"></div>
       </div>
       <div class="header-actions">
         <button class="hamburger" id="hamburger" aria-label="Menu">
@@ -181,6 +182,8 @@ function injectComponents() {
   renderFloatingCTA();
   // Load dynamic categories from API (updates nav after initial render)
   loadCategoriesNav();
+  // Smart search bar
+  initSmartSearch();
 }
 
 function updateCartCount() {
@@ -230,5 +233,145 @@ function updateFloatingCTA() {
 window.addEventListener('storage', updateFloatingCTA);
 // Expose so cart.js can call after saveCart
 window.updateFloatingCTA = updateFloatingCTA;
+
+// ===== SMART SEARCH BAR =====
+function initSmartSearch() {
+  const input = document.getElementById('search-input');
+  const dropdown = document.getElementById('search-dropdown');
+  const form = document.getElementById('search-form');
+  if (!input || !dropdown || !form) return;
+
+  let debounceTimer = null;
+  let lastQuery = '';
+
+  function escapeHtmlSearch(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function hideDropdown() {
+    dropdown.classList.remove('open');
+    dropdown.innerHTML = '';
+  }
+
+  function showDropdown(html) {
+    dropdown.innerHTML = html;
+    dropdown.classList.add('open');
+  }
+
+  // Log the search to the database
+  function logSearch(term) {
+    fetch('/api/book-requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookTitle: term, source: 'barre de recherche' }),
+    }).catch(function() {});
+  }
+
+  async function performSearch(query) {
+    if (query.length < 2) { hideDropdown(); return; }
+
+    try {
+      const res = await fetch('/api/books?q=' + encodeURIComponent(query) + '&limit=6');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const books = data.books || data;
+
+      // Log every search
+      logSearch(query);
+
+      if (books.length > 0) {
+        var html = books.map(function(book) {
+          var id = book._id || book.id;
+          var imgSrc = book.image
+            ? (book.image.startsWith('http') ? book.image : '/uploads/' + book.image)
+            : 'https://via.placeholder.com/40x60/E8F5E9/2E7D32?text=📚';
+          var price = (book.promoPrice || book.price || 0).toLocaleString('fr-FR');
+          return '<a href="livre.html?id=' + id + '" class="search-result-item">' +
+            '<img src="' + imgSrc + '" alt="" onerror="this.src=\'https://via.placeholder.com/40x60/E8F5E9/2E7D32?text=📚\'">' +
+            '<div class="search-result-info">' +
+            '<p class="search-result-title">' + escapeHtmlSearch(book.title) + '</p>' +
+            '<p class="search-result-author">' + escapeHtmlSearch(book.author) + '</p>' +
+            '</div>' +
+            '<span class="search-result-price">' + price + ' FCFA</span>' +
+            '</a>';
+        }).join('');
+        html += '<a href="catalogue.html?q=' + encodeURIComponent(query) + '" class="search-result-all">Voir tous les résultats</a>';
+        showDropdown(html);
+      } else {
+        // Not found — show request form
+        var nfHtml = '<div class="search-no-results">' +
+          '<p class="search-nf-title">Désolé, ce livre est en rupture de stock</p>' +
+          '<p class="search-nf-sub">Laissez votre numéro WhatsApp, nous vous contacterons dès qu\'il sera disponible.</p>' +
+          '<form id="search-request-form" class="search-nf-form">' +
+          '<input type="tel" id="search-wa-input" placeholder="Votre numéro WhatsApp" inputmode="numeric" required>' +
+          '<button type="submit">Soumettre</button>' +
+          '</form>' +
+          '<div id="search-request-success" style="display:none;">' +
+          '<p class="search-nf-success">Merci ! Nous vous contacterons bientôt.</p>' +
+          '</div>' +
+          '</div>';
+        showDropdown(nfHtml);
+
+        // Phone digits only
+        var waInput = document.getElementById('search-wa-input');
+        if (waInput) {
+          waInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+          });
+        }
+        // Submit request
+        var reqForm = document.getElementById('search-request-form');
+        if (reqForm) {
+          reqForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var phone = document.getElementById('search-wa-input').value.trim();
+            if (!phone) return;
+            fetch('/api/book-requests', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ bookTitle: query, whatsappNumber: phone, source: 'barre de recherche' }),
+            }).catch(function() {});
+            reqForm.style.display = 'none';
+            document.getElementById('search-request-success').style.display = 'block';
+          });
+        }
+      }
+    } catch (e) {
+      hideDropdown();
+    }
+  }
+
+  // Debounced input
+  input.addEventListener('input', function() {
+    var q = input.value.trim();
+    if (q === lastQuery) return;
+    lastQuery = q;
+    clearTimeout(debounceTimer);
+    if (q.length < 2) { hideDropdown(); return; }
+    debounceTimer = setTimeout(function() { performSearch(q); }, 400);
+  });
+
+  // Prevent form submit from navigating if dropdown is open with results
+  form.addEventListener('submit', function(e) {
+    var q = input.value.trim();
+    if (q.length >= 2) {
+      e.preventDefault();
+      clearTimeout(debounceTimer);
+      performSearch(q);
+    }
+  });
+
+  // Close dropdown on click outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-bar')) {
+      hideDropdown();
+    }
+  });
+
+  // Close on Escape
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') hideDropdown();
+  });
+}
 
 document.addEventListener('DOMContentLoaded', injectComponents);

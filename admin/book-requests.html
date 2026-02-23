@@ -46,6 +46,7 @@
                 <th>#</th>
                 <th>Titre recherché</th>
                 <th>WhatsApp</th>
+                <th>Source</th>
                 <th>Date</th>
                 <th>Statut</th>
                 <th>Action</th>
@@ -53,7 +54,7 @@
             </thead>
             <tbody id="requests-tbody">
               <tr>
-                <td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">
+                <td colspan="7" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">
                   Chargement…
                 </td>
               </tr>
@@ -73,7 +74,7 @@
 
     async function loadRequests() {
       const tbody = document.getElementById('requests-tbody');
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Chargement…</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Chargement…</td></tr>';
 
       try {
         const url = '/api/book-requests' + (currentFilter ? '?status=' + encodeURIComponent(currentFilter) : '');
@@ -87,7 +88,7 @@
           total + ' demande' + (total !== 1 ? 's' : '');
 
         if (!requests.length) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Aucune demande.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:var(--space-xl);color:var(--color-text-secondary);">Aucune demande.</td></tr>';
           return;
         }
 
@@ -96,11 +97,15 @@
             <td style="color:var(--color-text-secondary);font-size:var(--font-size-xs);">${i + 1}</td>
             <td><strong>${escapeHtml(r.bookTitle)}</strong></td>
             <td>
-              <a href="https://wa.me/${r.whatsappNumber}" target="_blank" rel="noopener"
-                style="color:var(--color-primary);font-weight:var(--font-weight-medium);text-decoration:underline;">
-                ${escapeHtml(r.whatsappNumber)}
-              </a>
+              ${r.whatsappNumber
+                ? `<a href="https://wa.me/${r.whatsappNumber}" target="_blank" rel="noopener"
+                    style="color:var(--color-primary);font-weight:var(--font-weight-medium);text-decoration:underline;">
+                    ${escapeHtml(r.whatsappNumber)}
+                  </a>`
+                : '<span style="color:var(--color-text-secondary);font-size:var(--font-size-xs);">—</span>'
+              }
             </td>
+            <td>${sourceBadge(r.source)}</td>
             <td style="font-size:var(--font-size-xs);color:var(--color-text-secondary);">${AdminUtils.formatDate(r.createdAt)}</td>
             <td>${statusBadge(r.status)}</td>
             <td>
@@ -118,13 +123,20 @@
         `).join('');
 
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:var(--space-xl);color:var(--color-error);">Erreur de chargement</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:var(--space-xl);color:var(--color-error);">Erreur de chargement</td></tr>';
       }
     }
 
     function statusBadge(status) {
       const map = { 'En attente': 'status-pending', 'Contacté': 'status-confirmed' };
       return `<span class="status-badge ${map[status] || ''}">${status}</span>`;
+    }
+
+    function sourceBadge(source) {
+      if (source === 'barre de recherche') {
+        return '<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600;background:#E3F2FD;color:#1565C0;">Recherche</span>';
+      }
+      return '<span style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600;background:#FFF3E0;color:#E65100;">Popup</span>';
     }
 
     function escapeHtml(str) {

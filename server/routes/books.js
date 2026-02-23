@@ -55,7 +55,11 @@ router.get('/', async (req, res) => {
 
     const filter = {};
 
-    if (q) filter.$text = { $search: q };
+    if (q) {
+      // Use $regex for case-insensitive partial matching on title + author
+      const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      filter.$or = [{ title: regex }, { author: regex }];
+    }
     if (category) filter.category = category;
     if (featured === 'true') filter.featured = true;
     if (heroFeatured === 'true') filter.heroFeatured = true;

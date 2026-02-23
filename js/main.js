@@ -15,7 +15,6 @@ function createBookCard(book) {
       <a href="livre.html?id=${book._id || book.id}">
         <img src="${imageSrc}" alt="${book.title}" loading="lazy" onerror="this.src='https://via.placeholder.com/200x300/E8F5E9/2E7D32?text=📚'">
       </a>
-      <span class="badge-category">${book.category || 'Livre'}</span>
       <span class="badge-physical">Livre physique</span>
     </div>
     <div class="book-card-body">

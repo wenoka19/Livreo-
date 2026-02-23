@@ -261,7 +261,7 @@
       await fetch('/api/book-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookTitle, whatsappNumber }),
+        body: JSON.stringify({ bookTitle, whatsappNumber, source: 'popup' }),
       });
     } catch (_) { /* save silently failed, user still gets the confirmation */ }
     document.getElementById('ei-notify-form').style.display = 'none';
