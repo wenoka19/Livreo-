@@ -12,6 +12,7 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -21,6 +22,18 @@ body {
   background: var(--color-background);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-x: clip;
+  width: 100%;
+}
+
+/* Global overflow containment */
+header, main, nav, section, footer,
+.site-header, .site-nav, .hero-banner,
+.book-section, .category-section, .reviews-section,
+.faq-section, .newsletter-section, .site-footer,
+.announcement-bar {
+  max-width: 100%;
   overflow-x: hidden;
 }
 
@@ -57,6 +70,7 @@ input, textarea, select {
   max-width: var(--container-max);
   margin: 0 auto;
   padding: 0 var(--space-lg);
+  overflow-x: hidden;
 }
 
 /* ===== ANNOUNCEMENT BAR ===== */
@@ -565,7 +579,7 @@ input, textarea, select {
 
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(185px, 100%), 1fr));
   gap: var(--space-lg);
 }
 
@@ -624,7 +638,7 @@ input, textarea, select {
 
 .reviews-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: var(--space-lg);
   margin-top: var(--space-xl);
 }
@@ -2021,13 +2035,15 @@ input, textarea, select {
     flex: 0 0 160px;
   }
 
-  /* Cart layout stacked */
+  /* Cart / Book detail / Checkout layout stacked */
   .cart-layout,
-  .checkout-layout {
+  .checkout-layout,
+  .book-detail-layout {
     grid-template-columns: 1fr;
   }
   .cart-summary,
-  .checkout-layout > div:last-child {
+  .checkout-layout > div:last-child,
+  .book-detail-cover {
     position: static;
   }
 
