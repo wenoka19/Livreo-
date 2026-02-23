@@ -1,33 +1,51 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { v2: cloudinary } = require('cloudinary');
 const Book = require('../models/Book');
 
-// Multer config for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../../uploads');
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `book-${Date.now()}${ext}`);
-  },
+// Configure Cloudinary from environment variables
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Multer: memory storage — files go directly to Cloudinary, never to disk
 const fileFilter = (req, file, cb) => {
   const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   cb(null, allowed.includes(file.mimetype));
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 5 * 1024 * 1024 } });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 function requireAdmin(req, res, next) {
   if (req.session?.isAdmin) return next();
   res.status(401).json({ message: 'Non autorisé' });
+}
+
+// Upload a buffer to Cloudinary and return the secure URL
+function uploadToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'livreo', resource_type: 'image' },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    );
+    stream.end(buffer);
+  });
+}
+
+// Extract Cloudinary public_id from URL (needed to delete the image)
+function extractPublicId(url) {
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/);
+  return match ? match[1] : null;
 }
 
 // GET /api/books — list with filters
@@ -80,7 +98,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', requireAdmin, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = req.file.filename;
+    if (req.file) data.image = await uploadToCloudinary(req.file.buffer);
     if (data.originalPrice) data.originalPrice = Number(data.originalPrice);
     if (data.promoPrice) data.promoPrice = Number(data.promoPrice);
     if (data.stock) data.stock = Number(data.stock);
@@ -99,7 +117,7 @@ router.post('/', requireAdmin, upload.single('image'), async (req, res) => {
 router.put('/:id', requireAdmin, upload.single('image'), async (req, res) => {
   try {
     const data = { ...req.body };
-    if (req.file) data.image = req.file.filename;
+    if (req.file) data.image = await uploadToCloudinary(req.file.buffer);
     if (data.originalPrice) data.originalPrice = Number(data.originalPrice);
     if (data.promoPrice) data.promoPrice = Number(data.promoPrice);
     if (data.stock !== undefined) data.stock = Number(data.stock);
@@ -120,10 +138,10 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     const book = await Book.findByIdAndDelete(req.params.id);
     if (!book) return res.status(404).json({ message: 'Livre introuvable' });
 
-    // Remove image file if exists
-    if (book.image) {
-      const imgPath = path.join(__dirname, '../../uploads', book.image);
-      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+    // Delete image from Cloudinary if it was stored there
+    if (book.image && book.image.includes('cloudinary.com')) {
+      const publicId = extractPublicId(book.image);
+      if (publicId) await cloudinary.uploader.destroy(publicId).catch(() => {});
     }
 
     res.json({ message: 'Livre supprimé' });
