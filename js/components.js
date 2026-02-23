@@ -53,6 +53,9 @@ function renderHeader() {
   </div>
   <header class="site-header">
     <div class="container">
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
       <a href="/index.html" class="logo">
         <svg class="logo-icon" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M4 6h12a4 4 0 0 1 4 4v18a3 3 0 0 0-3-3H4V6z"/>
@@ -72,9 +75,6 @@ function renderHeader() {
         <div class="search-dropdown" id="search-dropdown"></div>
       </div>
       <div class="header-actions">
-        <button class="hamburger" id="hamburger" aria-label="Menu">
-          <span></span><span></span><span></span>
-        </button>
         <a href="panier.html" class="cart-btn" id="cart-btn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
