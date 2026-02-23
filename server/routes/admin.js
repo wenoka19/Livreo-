@@ -12,7 +12,14 @@ router.post('/login', (req, res) => {
   if (username === envUser && password === envPass) {
     req.session.isAdmin = true;
     req.session.adminUser = username;
-    return res.json({ success: true, message: 'Connexion réussie' });
+    // Explicitly save session before responding to avoid race conditions
+    // where the client immediately calls /api/admin/check before the session
+    // is persisted to MongoDB (which would cause a spurious redirect to login).
+    req.session.save((err) => {
+      if (err) return res.status(500).json({ success: false, message: 'Erreur de session' });
+      res.json({ success: true, message: 'Connexion réussie' });
+    });
+    return;
   }
 
   res.status(401).json({ success: false, message: 'Identifiants incorrects' });

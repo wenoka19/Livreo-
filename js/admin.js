@@ -3,6 +3,10 @@
  * Sidebar injection, auth guard, shared helpers
  */
 
+// Hide the page immediately to prevent a flash of admin content
+// before the session check completes. Revealed in requireAdminAuth().
+document.body.style.visibility = 'hidden';
+
 const ADMIN_PAGES = [
   { label: 'Tableau de bord', href: 'dashboard.html', icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' },
   { label: 'Livres', href: 'livres.html', icon: '<path d="M4 6h12a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a4 4 0 0 1-4-4V6z"/><path d="M16 2H8a2 2 0 0 0-2 2v14"/>' },
@@ -44,12 +48,14 @@ async function requireAdminAuth() {
     const res = await fetch('/api/admin/check');
     const data = await res.json();
     if (!data.isAdmin) {
-      window.location.href = 'login.html';
+      window.location.replace('login.html');
       return false;
     }
+    // Auth confirmed — reveal the page
+    document.body.style.visibility = 'visible';
     return true;
   } catch {
-    window.location.href = 'login.html';
+    window.location.replace('login.html');
     return false;
   }
 }
@@ -61,7 +67,7 @@ function initAdminSidebar() {
     document.getElementById('logout-btn')?.addEventListener('click', async (e) => {
       e.preventDefault();
       await fetch('/api/admin/logout', { method: 'POST' });
-      window.location.href = 'login.html';
+      window.location.replace('login.html');
     });
   }
 }
