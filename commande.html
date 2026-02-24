@@ -129,7 +129,7 @@
       document.getElementById('order-subtotal').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
       document.getElementById('order-total').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
 
-      // FB Pixel: InitiateCheckout
+      // Facebook Tracking — InitiateCheckout
       if (window.FBTrack) {
         FBTrack.initiateCheckout(cart, total);
       }
@@ -153,10 +153,10 @@
         }
 
         const order = await res.json();
-        // FB Pixel: Purchase
+        // Facebook Tracking — Purchase
         if (window.FBTrack) {
           FBTrack.purchase({
-            id: order._id || order.id,
+            orderId: order._id || order.id,
             total: data.total,
             items: data.items,
             customer: data.customer,

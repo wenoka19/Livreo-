@@ -1,97 +1,102 @@
-/**
- * facebook.js — Facebook Conversions API module
- * Sends server-side events to Facebook for deduplication with browser Pixel.
- */
+// ===== FACEBOOK CONVERSIONS API - Configuration =====
+const bizSdk = require('facebook-nodejs-business-sdk');
+const { v4: uuidv4 } = require('uuid');
 
-const https = require('https');
-
-const PIXEL_ID = process.env.FB_PIXEL_ID;
 const ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
-const API_VERSION = 'v21.0';
+const PIXEL_ID = process.env.FB_PIXEL_ID;
 
-/**
- * Hash a value with SHA-256 (required by Facebook for user data)
- */
-function hashSHA256(value) {
-  if (!value) return undefined;
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(value.toString().trim().toLowerCase()).digest('hex');
+if (!ACCESS_TOKEN || !PIXEL_ID) {
+  console.warn('⚠️ FB_ACCESS_TOKEN ou FB_PIXEL_ID manquant dans .env — tracking Facebook désactivé');
 }
 
-/**
- * Send an event to Facebook Conversions API
- * @param {Object} opts
- * @param {string} opts.eventName - e.g. 'PageView', 'ViewContent', 'AddToCart', 'Purchase'
- * @param {string} opts.eventId - unique ID shared with browser pixel for dedup
- * @param {string} opts.sourceUrl - full page URL
- * @param {Object} opts.userData - { ip, ua, fbc, fbp, email, phone }
- * @param {Object} opts.customData - event-specific data { currency, value, content_ids, ... }
- */
-function sendEvent(opts) {
-  if (!PIXEL_ID || !ACCESS_TOKEN) {
-    console.warn('[FB] Missing FB_PIXEL_ID or FB_ACCESS_TOKEN — skipping server event');
-    return Promise.resolve();
-  }
-
-  const { eventName, eventId, sourceUrl, userData = {}, customData = {} } = opts;
-
-  const user_data = {};
-  if (userData.ip) user_data.client_ip_address = userData.ip;
-  if (userData.ua) user_data.client_user_agent = userData.ua;
-  if (userData.fbc) user_data.fbc = userData.fbc;
-  if (userData.fbp) user_data.fbp = userData.fbp;
-  if (userData.email) user_data.em = [hashSHA256(userData.email)];
-  if (userData.phone) user_data.ph = [hashSHA256(userData.phone)];
-
-  const eventData = {
-    event_name: eventName,
-    event_time: Math.floor(Date.now() / 1000),
-    event_id: eventId,
-    event_source_url: sourceUrl,
-    action_source: 'website',
-    user_data,
-  };
-
-  if (Object.keys(customData).length > 0) {
-    eventData.custom_data = customData;
-  }
-
-  const payload = JSON.stringify({
-    data: [eventData],
-    access_token: ACCESS_TOKEN,
-  });
-
-  return new Promise((resolve, reject) => {
-    const req = https.request(
-      {
-        hostname: 'graph.facebook.com',
-        path: `/${API_VERSION}/${PIXEL_ID}/events`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(payload),
-        },
-      },
-      (res) => {
-        let body = '';
-        res.on('data', (chunk) => (body += chunk));
-        res.on('end', () => {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            resolve(JSON.parse(body));
-          } else {
-            console.error(`[FB] API error ${res.statusCode}:`, body);
-            resolve(null); // don't reject — tracking errors shouldn't break the app
-          }
-        });
-      }
-    );
-    req.on('error', (err) => {
-      console.error('[FB] Request error:', err.message);
-      resolve(null);
-    });
-    req.write(payload);
-    req.end();
-  });
+if (ACCESS_TOKEN) {
+  bizSdk.FacebookAdsApi.init(ACCESS_TOKEN);
 }
 
-module.exports = { sendEvent, hashSHA256 };
+const EventRequest = bizSdk.EventRequest;
+const UserData = bizSdk.UserData;
+const ServerEvent = bizSdk.ServerEvent;
+const CustomData = bizSdk.CustomData;
+const Content = bizSdk.Content;
+
+/**
+ * Envoie un événement à l'API Conversions Facebook
+ */
+async function sendEvent({ eventName, eventId, sourceUrl, userData = {}, customData = {}, req }) {
+  if (!ACCESS_TOKEN || !PIXEL_ID) {
+    console.log(`[FB] Tracking désactivé — événement ${eventName} non envoyé`);
+    return null;
+  }
+
+  try {
+    // User Data
+    const fbUserData = new UserData();
+
+    if (userData.email) fbUserData.setEmail(userData.email.toLowerCase().trim());
+    if (userData.phone) fbUserData.setPhone(userData.phone.trim());
+    if (userData.firstName) fbUserData.setFirstName(userData.firstName.toLowerCase().trim());
+    if (userData.lastName) fbUserData.setLastName(userData.lastName.toLowerCase().trim());
+    if (userData.city) fbUserData.setCity(userData.city.toLowerCase().trim());
+    if (userData.country) fbUserData.setCountryCode(userData.country.toLowerCase().trim());
+
+    // IP et User-Agent depuis la requête Express
+    if (req) {
+      const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || req.connection?.remoteAddress;
+      if (ip) fbUserData.setClientIpAddress(ip);
+      if (req.headers['user-agent']) fbUserData.setClientUserAgent(req.headers['user-agent']);
+    }
+
+    // Cookies Facebook (fbc et fbp)
+    if (userData.fbc) fbUserData.setFbc(userData.fbc);
+    if (userData.fbp) fbUserData.setFbp(userData.fbp);
+
+    // Custom Data
+    const fbCustomData = new CustomData();
+
+    if (customData.value !== undefined) fbCustomData.setValue(customData.value);
+    if (customData.currency) fbCustomData.setCurrency(customData.currency);
+    if (customData.contentName) fbCustomData.setContentName(customData.contentName);
+    if (customData.contentCategory) fbCustomData.setContentCategory(customData.contentCategory);
+    if (customData.contentIds) fbCustomData.setContentIds(customData.contentIds);
+    if (customData.contentType) fbCustomData.setContentType(customData.contentType);
+    if (customData.numItems) fbCustomData.setNumItems(customData.numItems);
+    if (customData.orderId) fbCustomData.setOrderId(customData.orderId);
+
+    if (customData.contents && Array.isArray(customData.contents)) {
+      const contents = customData.contents.map(c => {
+        const content = new Content();
+        if (c.id) content.setId(c.id);
+        if (c.title) content.setTitle(c.title);
+        if (c.quantity) content.setQuantity(c.quantity);
+        if (c.itemPrice) content.setItemPrice(c.itemPrice);
+        return content;
+      });
+      fbCustomData.setContents(contents);
+    }
+
+    // Server Event
+    const serverEvent = new ServerEvent()
+      .setEventName(eventName)
+      .setEventTime(Math.floor(Date.now() / 1000))
+      .setUserData(fbUserData)
+      .setCustomData(fbCustomData)
+      .setActionSource('website');
+
+    if (eventId) serverEvent.setEventId(eventId);
+    if (sourceUrl) serverEvent.setEventSourceUrl(sourceUrl);
+
+    // Envoi
+    const eventRequest = new EventRequest(ACCESS_TOKEN, PIXEL_ID)
+      .setEvents([serverEvent]);
+
+    const response = await eventRequest.execute();
+    console.log(`[FB] ✅ Événement "${eventName}" envoyé — events_received: ${response._events_received}`);
+    return response;
+
+  } catch (error) {
+    console.error(`[FB] ❌ Erreur envoi "${eventName}":`, error.message);
+    return null;
+  }
+}
+
+module.exports = { sendEvent, uuidv4, PIXEL_ID };

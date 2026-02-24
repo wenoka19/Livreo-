@@ -45,6 +45,24 @@ app.use(session({
   },
 }));
 
+// Injecter le FB_PIXEL_ID dans les pages HTML
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') || req.path === '/') {
+    const filePath = req.path === '/' ? '/index.html' : req.path;
+    const fullPath = path.join(__dirname, '..', filePath);
+    const fs = require('fs');
+    fs.readFile(fullPath, 'utf8', (err, html) => {
+      if (err) return next();
+      const pixelId = process.env.FB_PIXEL_ID || '';
+      const injection = `<script>window.FB_PIXEL_ID="${pixelId}";</script>`;
+      html = html.replace('</head>', `${injection}\n</head>`);
+      res.send(html);
+    });
+  } else {
+    next();
+  }
+});
+
 // ===== STATIC FILES =====
 app.use(express.static(path.join(__dirname, '..')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

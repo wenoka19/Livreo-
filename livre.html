@@ -152,12 +152,12 @@
       // Load related
       loadBooks('related-books', { category: book.category });
 
-      // FB Pixel: ViewContent
+      // Facebook Tracking — ViewContent
       if (window.FBTrack) {
         FBTrack.viewContent({
           id: book._id || book.id,
           title: book.title,
-          category: book.category || '',
+          category: book.category,
           price: book.promoPrice || book.price || 0,
         });
       }
@@ -185,14 +185,13 @@
           image: imgSrc,
           qty
         });
-        // FB Pixel: AddToCart
+        // Facebook Tracking — AddToCart
         if (window.FBTrack) {
           FBTrack.addToCart({
             id: bookData._id || bookData.id,
             title: bookData.title,
             price: promo,
-            qty: qty,
-          });
+          }, qty);
         }
         // Visual feedback
         const btn = this;
