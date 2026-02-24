@@ -2051,9 +2051,24 @@ input, textarea, select {
   /* Catalogue */
   .catalogue-layout {
     grid-template-columns: 1fr;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .catalogue-layout > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
   }
   .filters-sidebar {
     position: static;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .catalogue-toolbar {
+    max-width: 100%;
   }
 
   /* Book cards: 2 columns on mobile, compact */
