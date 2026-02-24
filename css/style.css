@@ -2050,43 +2050,55 @@ input, textarea, select {
     position: static;
   }
 
-  /* Book cards: 2 columns on mobile */
+  /* Book cards: 2 columns on mobile, compact */
   .books-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-sm);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 8px;
   }
 
   .book-card {
-    flex: 0 0 160px;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    max-width: 100%;
   }
 
   .book-card-image {
-    height: 200px;
+    height: 160px;
   }
 
   .book-card-body {
-    padding: var(--space-sm);
+    padding: 8px;
   }
 
   .book-card-title {
-    font-size: 0.8rem;
+    font-size: 12px;
+    margin-bottom: 2px;
   }
 
   .book-card-author {
-    font-size: 0.7rem;
+    font-size: 11px;
+    margin-bottom: 4px;
   }
 
   .price-original {
-    font-size: 14px;
+    font-size: 11px;
   }
 
   .price-promo {
-    font-size: 18px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .book-card-pricing {
+    margin-bottom: 6px;
   }
 
   .btn-add-cart {
-    padding: var(--space-xs) var(--space-sm);
-    font-size: 0.75rem;
+    padding: 6px 8px;
+    font-size: 11px;
+    min-height: 0;
   }
 
   /* Cart / Book detail / Checkout layout stacked */
