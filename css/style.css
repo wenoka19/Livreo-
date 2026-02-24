@@ -27,14 +27,18 @@ body {
   width: 100%;
 }
 
-/* Global overflow containment */
-header, main, nav, section, footer,
-.site-header, .site-nav, .hero-banner,
+/* Global overflow containment — use clip (not hidden) to avoid forcing overflow-y:auto */
+main, nav, section, footer,
+.site-nav, .hero-banner,
 .book-section, .category-section, .reviews-section,
 .faq-section, .newsletter-section, .site-footer,
 .announcement-bar {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+/* Header needs visible overflow-y for search dropdown */
+header, .site-header {
+  max-width: 100%;
 }
 
 a {
@@ -70,7 +74,6 @@ input, textarea, select {
   max-width: var(--container-max);
   margin: 0 auto;
   padding: 0 var(--space-lg);
-  overflow-x: hidden;
 }
 
 /* ===== ANNOUNCEMENT BAR ===== */
@@ -155,7 +158,7 @@ input, textarea, select {
   border: none;
   background: transparent;
   outline: none;
-  font-size: var(--font-size-sm);
+  font-size: 16px;
   color: var(--color-text);
 }
 
@@ -1805,7 +1808,7 @@ input, textarea, select {
   padding: var(--space-sm) var(--space-md);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
+  font-size: 16px;
   font-family: var(--font-family);
   outline: none;
 }
@@ -1996,7 +1999,6 @@ input, textarea, select {
     height: auto;
     padding: var(--space-sm) 0;
     gap: 0;
-    overflow-x: hidden;
   }
   .site-nav.mobile-open .nav-link {
     height: auto;
