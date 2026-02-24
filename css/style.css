@@ -447,6 +447,8 @@ input, textarea, select {
 /* ===== BOOK CARD ===== */
 .book-card {
   flex: 0 0 200px;
+  display: flex;
+  flex-direction: column;
   background: var(--color-white);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -464,15 +466,16 @@ input, textarea, select {
 
 .book-card-image {
   position: relative;
-  aspect-ratio: 2/3;
-  background: var(--color-surface);
+  height: 280px;
+  background: #F5F5F5;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .book-card-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform var(--transition-slow);
 }
 
@@ -517,6 +520,9 @@ input, textarea, select {
 
 .book-card-body {
   padding: var(--space-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .book-card-title {
@@ -535,24 +541,28 @@ input, textarea, select {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   margin-bottom: var(--space-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .book-card-pricing {
   display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   margin-bottom: var(--space-md);
 }
 
 .price-original {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  font-size: 16px;
+  color: #E53935;
   text-decoration: line-through;
+  font-weight: var(--font-weight-medium);
 }
 
 .price-promo {
-  font-size: var(--font-size-md);
+  font-size: 22px;
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
 }
@@ -567,6 +577,7 @@ input, textarea, select {
   font-weight: var(--font-weight-semibold);
   text-align: center;
   transition: background var(--transition-fast), transform var(--transition-fast);
+  margin-top: auto;
 }
 
 .btn-add-cart:hover {
@@ -582,7 +593,7 @@ input, textarea, select {
 
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(185px, 100%), 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-lg);
 }
 
@@ -1895,6 +1906,13 @@ input, textarea, select {
   flex-shrink: 0;
 }
 
+/* Tablet: 3 columns */
+@media (max-width: 1024px) {
+  .books-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .floating-cta {
     padding: var(--space-md);
@@ -2032,9 +2050,43 @@ input, textarea, select {
     position: static;
   }
 
-  /* Book cards wider on mobile */
+  /* Book cards: 2 columns on mobile */
+  .books-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+
   .book-card {
     flex: 0 0 160px;
+  }
+
+  .book-card-image {
+    height: 200px;
+  }
+
+  .book-card-body {
+    padding: var(--space-sm);
+  }
+
+  .book-card-title {
+    font-size: 0.8rem;
+  }
+
+  .book-card-author {
+    font-size: 0.7rem;
+  }
+
+  .price-original {
+    font-size: 14px;
+  }
+
+  .price-promo {
+    font-size: 18px;
+  }
+
+  .btn-add-cart {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
   }
 
   /* Cart / Book detail / Checkout layout stacked */
@@ -2105,11 +2157,6 @@ input, textarea, select {
 @media (max-width: 480px) {
   .container {
     padding: 0 var(--space-md);
-  }
-
-  .books-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
   }
 
   .book-card {
