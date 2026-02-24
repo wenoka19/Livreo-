@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const path = require('path');
 
 // Fail fast when MongoDB is not connected (don't buffer queries)
@@ -23,6 +24,7 @@ if (isProduction) {
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/livreo';
 
@@ -54,6 +56,7 @@ const adminRouter = require('./routes/admin');
 const categoriesRouter = require('./routes/categories');
 const settingsRouter = require('./routes/settings');
 const bookRequestsRouter = require('./routes/book-requests');
+const fbTrackRouter = require('./routes/fb-track');
 
 app.use('/api/books', booksRouter);
 app.use('/api/orders', ordersRouter);
@@ -61,6 +64,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/book-requests', bookRequestsRouter);
+app.use('/api/fb', fbTrackRouter);
 
 // ===== HEALTH CHECK =====
 app.get('/api/health', (req, res) => {

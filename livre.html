@@ -94,6 +94,7 @@
 
   <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}</style>
 
+  <script src="js/fb-pixel.js"></script>
   <script src="js/components.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/main.js"></script>
@@ -150,6 +151,16 @@
 
       // Load related
       loadBooks('related-books', { category: book.category });
+
+      // FB Pixel: ViewContent
+      if (window.FBTrack) {
+        FBTrack.viewContent({
+          id: book._id || book.id,
+          title: book.title,
+          category: book.category || '',
+          price: book.promoPrice || book.price || 0,
+        });
+      }
     }
 
     function initQuantity() {
@@ -174,6 +185,15 @@
           image: imgSrc,
           qty
         });
+        // FB Pixel: AddToCart
+        if (window.FBTrack) {
+          FBTrack.addToCart({
+            id: bookData._id || bookData.id,
+            title: bookData.title,
+            price: promo,
+            qty: qty,
+          });
+        }
         // Visual feedback
         const btn = this;
         const orig = btn.innerHTML;

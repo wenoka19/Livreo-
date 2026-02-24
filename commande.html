@@ -94,6 +94,7 @@
   <div id="footer-placeholder"></div>
   <div class="toast" id="toast"></div>
 
+  <script src="js/fb-pixel.js"></script>
   <script src="js/components.js"></script>
   <script src="js/cart.js"></script>
   <script>
@@ -127,6 +128,11 @@
       }
       document.getElementById('order-subtotal').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
       document.getElementById('order-total').textContent = `${total.toLocaleString('fr-FR')} FCFA`;
+
+      // FB Pixel: InitiateCheckout
+      if (window.FBTrack) {
+        FBTrack.initiateCheckout(cart, total);
+      }
     }
 
     async function submitOrder(data) {
@@ -147,6 +153,15 @@
         }
 
         const order = await res.json();
+        // FB Pixel: Purchase
+        if (window.FBTrack) {
+          FBTrack.purchase({
+            id: order._id || order.id,
+            total: data.total,
+            items: data.items,
+            customer: data.customer,
+          });
+        }
         Cart.clearCart();
         window.location.href = `confirmation.html?id=${order._id || order.id}&num=${order.orderNumber || order._id}`;
       } catch (err) {
