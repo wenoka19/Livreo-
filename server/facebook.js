@@ -1,6 +1,6 @@
 // ===== FACEBOOK CONVERSIONS API - Configuration =====
 const bizSdk = require('facebook-nodejs-business-sdk');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 const ACCESS_TOKEN = process.env.FB_ACCESS_TOKEN;
 const PIXEL_ID = process.env.FB_PIXEL_ID;
@@ -99,4 +99,4 @@ async function sendEvent({ eventName, eventId, sourceUrl, userData = {}, customD
   }
 }
 
-module.exports = { sendEvent, uuidv4, PIXEL_ID };
+module.exports = { sendEvent, randomUUID, PIXEL_ID };

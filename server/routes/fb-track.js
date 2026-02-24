@@ -1,7 +1,7 @@
 // ===== FACEBOOK TRACKING ROUTES =====
 const express = require('express');
 const router = express.Router();
-const { sendEvent, uuidv4 } = require('../facebook');
+const { sendEvent, randomUUID } = require('../facebook');
 
 // POST /api/fb/track — Reçoit les événements du frontend et les envoie côté serveur
 router.post('/track', async (req, res) => {
@@ -18,7 +18,7 @@ router.post('/track', async (req, res) => {
 
     await sendEvent({
       eventName,
-      eventId: eventId || uuidv4(),
+      eventId: eventId || randomUUID(),
       sourceUrl,
       userData: {
         ...userData,
