@@ -6,8 +6,8 @@ const BookRequest = require('../models/BookRequest');
 router.post('/', async (req, res) => {
   try {
     const { bookTitle, whatsappNumber, source } = req.body;
-    if (!bookTitle) {
-      return res.status(400).json({ message: 'Titre du livre requis' });
+    if (!bookTitle || bookTitle.trim().length < 3) {
+      return res.status(400).json({ message: 'Titre du livre requis (minimum 3 caractères)' });
     }
     const data = { bookTitle: bookTitle.trim(), whatsappNumber: (whatsappNumber || '').trim() };
     if (source === 'barre de recherche') data.source = 'barre de recherche';

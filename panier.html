@@ -29,47 +29,82 @@
       </div>
 
       <!-- Cart with items -->
-      <div class="cart-page" id="cart-with-items">
-        <div class="cart-layout">
-          <div>
-            <div class="cart-items" id="cart-items-list">
-              <!-- Items injected by JS -->
-            </div>
-          </div>
+      <div class="cart-page hidden" id="cart-with-items">
 
-          <div class="cart-summary">
-            <h2 class="cart-summary-title">Récapitulatif</h2>
-            <div class="cart-summary-row">
-              <span>Sous-total</span>
-              <span id="cart-subtotal">0 FCFA</span>
-            </div>
-            <div class="cart-summary-row">
-              <span>Livraison</span>
-              <span id="delivery-label" style="color:var(--color-primary);font-weight:var(--font-weight-medium);">Gratuite</span>
-            </div>
-            <div class="cart-summary-row">
-              <span>Paiement</span>
-              <span>À la livraison</span>
-            </div>
-            <div class="cart-summary-total">
-              <span>Total</span>
-              <span id="cart-total">0 FCFA</span>
-            </div>
-
-            <div class="cod-notice" style="margin-bottom:var(--space-lg);">
-              <span class="cod-notice-icon">💵</span>
-              <span class="cod-notice-text">Paiement en espèces à la réception de votre commande</span>
-            </div>
-
-            <a href="commande.html" class="btn-checkout" id="btn-checkout">
-              Passer la commande →
-            </a>
-
-            <a href="catalogue.html" class="section-link" style="justify-content:center;margin-top:var(--space-md);">
-              ← Continuer mes achats
-            </a>
-          </div>
+        <!-- a) Cart items list -->
+        <div class="cart-items" id="cart-items-list">
+          <!-- Items injected by JS -->
         </div>
+
+        <!-- b) Order form -->
+        <div class="checkout-form-card" id="order-section" style="margin-top:var(--space-xl);">
+          <h2 class="checkout-form-title">Vos informations de livraison</h2>
+
+          <div class="cod-notice">
+            <span class="cod-notice-icon">💵</span>
+            <div class="cod-notice-text">Paiement à la livraison — Aucun paiement en ligne requis</div>
+          </div>
+
+          <form id="order-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="full-name">Nom complet <span>*</span></label>
+                <input type="text" id="full-name" class="form-input" placeholder="Ex: Aminata Konaté" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="phone">Numéro de téléphone (WhatsApp de préférence) <span>*</span></label>
+                <input type="tel" id="phone" class="form-input" placeholder="Ex: 90000000" required pattern="[0-9]+" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="address">Adresse de livraison <span>*</span></label>
+              <input type="text" id="address" class="form-input" placeholder="Ex: Quartier Tokoin, Rue 15, Maison N°3" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="note">Note optionnelle (facultatif)</label>
+              <textarea id="note" class="form-textarea" placeholder="Instructions particulières pour la livraison..."></textarea>
+            </div>
+
+            <div id="form-error" style="display:none;background:#FFEBEE;color:var(--color-error);padding:var(--space-md);border-radius:var(--radius-md);font-size:var(--font-size-sm);margin-bottom:var(--space-md);"></div>
+          </form>
+        </div>
+
+        <!-- c) Recap + d) Submit button -->
+        <div class="cart-summary" style="margin-top:var(--space-xl);">
+          <h2 class="cart-summary-title">Récapitulatif</h2>
+          <div class="cart-summary-row">
+            <span>Sous-total</span>
+            <span id="cart-subtotal">0 FCFA</span>
+          </div>
+          <div class="cart-summary-row">
+            <span>Livraison</span>
+            <span id="delivery-label" style="color:var(--color-primary);font-weight:var(--font-weight-medium);">Gratuite</span>
+          </div>
+          <div class="cart-summary-row">
+            <span>Paiement</span>
+            <span>À la livraison</span>
+          </div>
+          <div class="cart-summary-total">
+            <span>Total</span>
+            <span id="cart-total">0 FCFA</span>
+          </div>
+
+          <div class="cod-notice" style="margin-bottom:var(--space-lg);">
+            <span class="cod-notice-icon">💵</span>
+            <span class="cod-notice-text">Paiement en espèces à la réception de votre commande</span>
+          </div>
+
+          <button type="button" class="btn-place-order" id="btn-confirm-order">
+            Confirmer ma commande
+          </button>
+
+          <a href="catalogue.html" class="section-link" style="justify-content:center;margin-top:var(--space-md);">
+            ← Continuer mes achats
+          </a>
+        </div>
+
       </div>
     </div>
   </main>
@@ -81,6 +116,8 @@
   <script src="js/components.js"></script>
   <script src="js/cart.js"></script>
   <script>
+    var checkoutTracked = false;
+
     function renderCartItem(item) {
       const imgSrc = item.image || 'https://via.placeholder.com/80x120/E8F5E9/2E7D32?text=📚';
       return `
@@ -147,7 +184,99 @@
       Cart.showToast('Livre retiré du panier', '');
     }
 
-    document.addEventListener('DOMContentLoaded', renderCart);
+    async function submitOrder(data) {
+      const btn = document.getElementById('btn-confirm-order');
+      btn.disabled = true;
+      btn.textContent = 'Traitement en cours...';
+
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message || 'Erreur lors de la commande');
+        }
+
+        const order = await res.json();
+        // Facebook Tracking — Purchase
+        if (window.FBTrack) {
+          FBTrack.purchase({
+            orderId: order._id || order.id,
+            total: data.total,
+            items: data.items,
+            customer: data.customer,
+          });
+        }
+        Cart.clearCart();
+        window.location.href = `confirmation.html?id=${order._id || order.id}&num=${order.orderNumber || order._id}`;
+      } catch (err) {
+        const errorEl = document.getElementById('form-error');
+        errorEl.style.display = 'block';
+        errorEl.textContent = err.message || 'Erreur lors de la commande. Veuillez réessayer.';
+        btn.disabled = false;
+        btn.textContent = 'Confirmer ma commande';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCart();
+
+      // Phone: numbers only
+      const phoneInput = document.getElementById('phone');
+      if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+          this.value = this.value.replace(/[^0-9]/g, '');
+        });
+      }
+
+      // Facebook Tracking — InitiateCheckout on first form interaction
+      const orderSection = document.getElementById('order-section');
+      if (orderSection) {
+        orderSection.addEventListener('focusin', function() {
+          if (!checkoutTracked && window.FBTrack) {
+            checkoutTracked = true;
+            const cart = Cart.getCart();
+            const total = Cart.getCartTotal();
+            FBTrack.initiateCheckout(cart, total);
+          }
+        });
+      }
+
+      // Confirm order button
+      document.getElementById('btn-confirm-order').addEventListener('click', async () => {
+        const errorEl = document.getElementById('form-error');
+        errorEl.style.display = 'none';
+
+        const name = document.getElementById('full-name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const note = document.getElementById('note').value.trim();
+        const cart = Cart.getCart();
+
+        if (cart.length === 0) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Votre panier est vide.';
+          return;
+        }
+
+        if (!name || !phone || !address) {
+          errorEl.style.display = 'block';
+          errorEl.textContent = 'Veuillez remplir tous les champs obligatoires (marqués d\'un *).';
+          document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+
+        await submitOrder({
+          customer: { name, phone, address, note },
+          items: cart.map(i => ({ book: i.id, title: i.title, qty: i.qty, price: i.price })),
+          total: Cart.getCartTotal(),
+        });
+      });
+    });
   </script>
 </body>
 </html>

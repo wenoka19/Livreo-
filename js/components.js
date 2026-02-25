@@ -194,17 +194,27 @@ function updateCartCount() {
 
 // ===== FLOATING CTA BAR =====
 function renderFloatingCTA() {
-  // Don't show on panier/commande/confirmation pages
+  // Don't show on confirmation page
   const page = window.location.pathname.split('/').pop() || 'index.html';
-  if (['panier.html', 'commande.html', 'confirmation.html'].includes(page)) return;
+  if (['confirmation.html'].includes(page)) return;
+
+  const isCartPage = (page === 'panier.html');
 
   const cta = document.createElement('a');
-  cta.href = 'panier.html';
+  cta.href = isCartPage ? '#order-section' : 'panier.html';
   cta.className = 'floating-cta';
   cta.id = 'floating-cta';
   cta.innerHTML = '<span class="floating-cta-text" id="floating-cta-text">Voir et finaliser ma commande</span><span class="floating-cta-arrow">→</span>';
-  document.body.appendChild(cta);
 
+  if (isCartPage) {
+    cta.addEventListener('click', function(e) {
+      e.preventDefault();
+      var section = document.getElementById('order-section');
+      if (section) section.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  document.body.appendChild(cta);
   updateFloatingCTA();
 }
 
@@ -216,9 +226,12 @@ function updateFloatingCTA() {
   const count = cart.reduce((sum, item) => sum + item.qty, 0);
   const textEl = document.getElementById('floating-cta-text');
 
+  var isOnCartPage = (window.location.pathname.split('/').pop() || '') === 'panier.html';
   if (count > 0) {
     cta.classList.add('visible');
-    if (textEl) textEl.textContent = `Voir et finaliser ma commande — ${total.toLocaleString('fr-FR')} FCFA`;
+    if (textEl) textEl.textContent = isOnCartPage
+      ? `Finaliser ma commande — ${total.toLocaleString('fr-FR')} FCFA`
+      : `Voir et finaliser ma commande — ${total.toLocaleString('fr-FR')} FCFA`;
     // Adjust whatsapp button
     const wa = document.querySelector('.whatsapp-btn');
     if (wa) wa.classList.remove('no-cta');
@@ -243,6 +256,8 @@ function initSmartSearch() {
 
   let debounceTimer = null;
   let lastQuery = '';
+  let lastLoggedSearch = '';
+  let logDebounceTimer = null;
 
   function escapeHtmlSearch(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -258,8 +273,11 @@ function initSmartSearch() {
     dropdown.classList.add('open');
   }
 
-  // Log the search to the database
+  // Log the search to the database — only if >= 3 chars and different from last logged
   function logSearch(term) {
+    if (!term || term.length < 3) return;
+    if (term === lastLoggedSearch) return;
+    lastLoggedSearch = term;
     fetch('/api/book-requests', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -267,7 +285,14 @@ function initSmartSearch() {
     }).catch(function() {});
   }
 
-  async function performSearch(query) {
+  // Schedule a log after 2s of inactivity
+  function scheduleLogSearch(term) {
+    clearTimeout(logDebounceTimer);
+    if (!term || term.length < 3) return;
+    logDebounceTimer = setTimeout(function() { logSearch(term); }, 2000);
+  }
+
+  async function performSearch(query, shouldLog) {
     if (query.length < 2) { hideDropdown(); return; }
 
     try {
@@ -276,8 +301,8 @@ function initSmartSearch() {
       const data = await res.json();
       const books = data.books || data;
 
-      // Log every search
-      logSearch(query);
+      // Only log on explicit action (Enter/click), not on every keystroke
+      if (shouldLog) logSearch(query);
 
       if (books.length > 0) {
         var html = books.map(function(book) {
@@ -341,23 +366,26 @@ function initSmartSearch() {
     }
   }
 
-  // Debounced input
+  // Debounced input — show results but don't log yet
   input.addEventListener('input', function() {
     var q = input.value.trim();
     if (q === lastQuery) return;
     lastQuery = q;
     clearTimeout(debounceTimer);
     if (q.length < 2) { hideDropdown(); return; }
-    debounceTimer = setTimeout(function() { performSearch(q); }, 400);
+    debounceTimer = setTimeout(function() { performSearch(q, false); }, 400);
+    // Schedule log after 2s of inactivity
+    scheduleLogSearch(q);
   });
 
-  // Prevent form submit from navigating if dropdown is open with results
+  // Form submit (Enter or search icon click) — log the search
   form.addEventListener('submit', function(e) {
     var q = input.value.trim();
     if (q.length >= 2) {
       e.preventDefault();
       clearTimeout(debounceTimer);
-      performSearch(q);
+      clearTimeout(logDebounceTimer);
+      performSearch(q, true);
     }
   });
 
